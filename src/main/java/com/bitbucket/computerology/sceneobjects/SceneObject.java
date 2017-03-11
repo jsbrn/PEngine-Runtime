@@ -1,14 +1,10 @@
-package com.bitbucket.computerology.world;
+package com.bitbucket.computerology.sceneobjects;
 
 import com.bitbucket.computerology.gui.GameScreen;
 import com.bitbucket.computerology.gui.elements.SpeechBalloon;
-import com.bitbucket.computerology.misc.Animation;
-import com.bitbucket.computerology.misc.Dialogue;
-import com.bitbucket.computerology.misc.Force;
 import com.bitbucket.computerology.misc.MiscMath;
-import com.bitbucket.computerology.misc.Script;
+import com.bitbucket.computerology.world.Camera;
 import java.util.ArrayList;
-import java.util.Random;
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
@@ -183,6 +179,7 @@ public class SceneObject {
         
         world_x += x;
         world_y += y;
+        
         if (x_object != null) {
             if (x > 0) {
                 this.setWorldTopLeft(x_object.getWorldTopLeft()[0]-this.getDimensions()[0], -1);

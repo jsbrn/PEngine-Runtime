@@ -1,5 +1,6 @@
 package com.bitbucket.computerology.world;
 
+import com.bitbucket.computerology.sceneobjects.SceneObject;
 import com.bitbucket.computerology.gui.GameScreen;
 import com.bitbucket.computerology.misc.MiscMath;
 import org.lwjgl.opengl.Display;

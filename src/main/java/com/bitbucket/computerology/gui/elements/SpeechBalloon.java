@@ -3,7 +3,7 @@ package com.bitbucket.computerology.gui.elements;
 import com.bitbucket.computerology.gui.GameScreen;
 import com.bitbucket.computerology.misc.MiscMath;
 import com.bitbucket.computerology.world.Camera;
-import com.bitbucket.computerology.world.SceneObject;
+import com.bitbucket.computerology.sceneobjects.SceneObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.newdawn.slick.Color;

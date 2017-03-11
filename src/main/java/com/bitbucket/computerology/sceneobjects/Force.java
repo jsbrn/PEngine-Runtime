@@ -1,6 +1,7 @@
-package com.bitbucket.computerology.misc;
+package com.bitbucket.computerology.sceneobjects;
 
 import com.bitbucket.computerology.gui.GameScreen;
+import com.bitbucket.computerology.misc.MiscMath;
 
 public class Force {
     

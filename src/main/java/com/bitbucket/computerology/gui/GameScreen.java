@@ -2,15 +2,15 @@ package com.bitbucket.computerology.gui;
 
 import com.bitbucket.computerology.gui.elements.*;
 import com.bitbucket.computerology.main.SlickInitializer;
-import com.bitbucket.computerology.misc.Animation;
-import com.bitbucket.computerology.misc.Dialogue;
-import com.bitbucket.computerology.misc.Script;
+import com.bitbucket.computerology.sceneobjects.Animation;
+import com.bitbucket.computerology.sceneobjects.Dialogue;
+import com.bitbucket.computerology.sceneobjects.Script;
 import com.bitbucket.computerology.world.Camera;
 import java.util.ArrayList;
 
 import com.bitbucket.computerology.world.Level;
 import com.bitbucket.computerology.world.Player;
-import com.bitbucket.computerology.world.SceneObject;
+import com.bitbucket.computerology.sceneobjects.SceneObject;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -233,7 +233,7 @@ public class GameScreen extends BasicGameState {
         
         //load the player data and import it into the player object
         GameScreen.PLAYER = new Player();
-        loadObject(-1, -1, prop, true).copyTo(PLAYER);
+        loadObject(-1, 0, true, prop).copyTo(PLAYER);
         GameScreen.PLAYER.LAYER = 2;
         
         //load levels
@@ -278,7 +278,7 @@ public class GameScreen extends BasicGameState {
 
         int obj_count = Integer.parseInt(prop.getProperty("Lvl"+index+"ObjectCount"));
         for (int i = 0; i != obj_count; i++) {
-            SceneObject o = loadObject(index, i, prop, false);
+            SceneObject o = loadObject(index, i, false, prop);
             if (o != null) level.add(o);
         }
 
@@ -296,9 +296,10 @@ public class GameScreen extends BasicGameState {
 
     }
     
-    static SceneObject loadObject(int lindex, int oindex, Properties prop, boolean player) {
+    static SceneObject loadObject(int lindex, int oindex, boolean gallery, Properties prop) {
         String prefix = "Lvl"+lindex;
-        if (player) { prefix = "Gall"; oindex = 0; }
+        if (gallery) { prefix = "Gall"; }
+        System.out.println("Loading object "+(prefix+"Obj"+oindex)+", gallery = "+true+", level = "+lindex);
         SceneObject o = new SceneObject();
         String pos = prop.getProperty(prefix+"Obj"+oindex+"Pos");
         String dim = prop.getProperty(prefix+"Obj"+oindex+"Dim");
@@ -313,14 +314,7 @@ public class GameScreen extends BasicGameState {
         o.GRAVITY = Boolean.parseBoolean(prop.getProperty(prefix+"Obj"+oindex+"Grav"));
         o.COLLIDES = Boolean.parseBoolean(prop.getProperty(prefix+"Obj"+oindex+"Coll"));
         //o.CLASS = prop.getProperty(prefix+"Obj"+oindex+"Type"); THE GAME DOESNT NEED TO KNOW THE CLASS OF THE OBJECT
-
-        int script_count = Integer.parseInt(prop.getProperty(prefix+"Obj"+oindex+"ScrCount"));
-        for (int ii = 0; ii != script_count; ii++) {
-            Script s = new Script(o);
-            o.SCRIPTS.add(s);
-            s.NAME = prop.getProperty(prefix+"Obj"+oindex+"Scr"+ii+"Name");
-            s.CONTENTS = parseString(prop.getProperty(prefix+"Obj"+oindex+"Scr"+ii+"Content"));
-        }
+        
         int anim_count = Integer.parseInt(prop.getProperty(prefix+"Obj"+oindex+"AnimCount"));
         for (int ii = 0; ii != anim_count; ii++) {
             Animation s = new Animation(o);

@@ -1,7 +1,7 @@
 package com.bitbucket.computerology.gui.elements;
 
 import com.bitbucket.computerology.gui.GameScreen;
-import com.bitbucket.computerology.misc.Dialogue;
+import com.bitbucket.computerology.sceneobjects.Dialogue;
 import com.bitbucket.computerology.misc.MiscMath;
 import com.bitbucket.computerology.world.Camera;
 import java.util.logging.Level;

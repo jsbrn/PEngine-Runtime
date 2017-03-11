@@ -1,8 +1,9 @@
-package com.bitbucket.computerology.misc;
+package com.bitbucket.computerology.sceneobjects;
 
 import com.bitbucket.computerology.gui.GameScreen;
+import com.bitbucket.computerology.misc.MiscMath;
 import com.bitbucket.computerology.world.Camera;
-import com.bitbucket.computerology.world.SceneObject;
+import com.bitbucket.computerology.sceneobjects.SceneObject;
 import java.util.ArrayList;
 
 public class Script {

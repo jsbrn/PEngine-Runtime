@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.bitbucket.computerology</groupId>
-  <artifactId>TwelveHundredSeconds</artifactId>
+  <artifactId>platformr-runtime</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>TwelveHundredSeconds</name>
+  <name>platformr-runtime</name>
   <url>http://maven.apache.org</url>
 
   <properties>

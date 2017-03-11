@@ -16,7 +16,7 @@ public class SlickInitializer extends StateBasedGame {
     public static final String WINDOW_TITLE = "Twelve Hundred Seconds", ROOT_FOLDER_NAME = "ths";
     //set ids to the states
     public static final int GAME_SCREEN = 0;
-    public static int UPDATE_ID = 8;
+    public static int UPDATE_ID = 10;
     boolean initialized = false;
     
     public static String PROJECT_FOLDER = "", STARTING_LEVEL = "";
