@@ -176,6 +176,10 @@ public class Block {
         return outputs[index];
     }
     
+    public int getConn(int index) {
+        return conns[index][0];
+    }
+    
     public void randomID() {
         this.id = Math.abs(new Random().nextInt());
     }
