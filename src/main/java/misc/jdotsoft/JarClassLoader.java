@@ -21,7 +21,7 @@
  *
  * $Id: JarClassLoader.java,v 1.38 2013/03/29 15:27:33 mg Exp $
  */
-package com.jdotsoft;
+package misc.jdotsoft;
 
 import java.applet.AppletContext;
 import java.applet.AppletStub;

@@ -5,7 +5,7 @@
   <artifactId>platformr-runtime</artifactId>
   <name>platformr-runtime</name>
   <version>0.1-SNAPSHOT</version>
-  <url>http://maven.apache.org</url>
+  <url>http://computerology.bitbucket.io</url>
   <build>
     <plugins>
       <plugin>
@@ -72,7 +72,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.bitbucket.computerology.main.Launcher</mainClass>
+                  <mainClass>main.Launcher</mainClass>
                 </transformer>
               </transformers>
               <artifactSet>
@@ -106,10 +106,10 @@
             <option>-dontshrink</option>
             <option>-dontoptimize</option>
             <option>-keep class * implements java.sql.Driver</option>
-            <option>-keep public class com.bitbucket.computerology.main.SlickInitializer {
+            <option>-keep public class main.SlickInitializer {
                                 *;
                             }</option>
-            <option>-keep public class com.bitbucket.computerology.main.Launcher {
+            <option>-keep public class main.Launcher {
                                 public static void main(java.lang.String[]);
                             }</option>
           </options>
