@@ -13,7 +13,7 @@ import world.objects.SceneObject;
 public class Level {
     
     public static final int ALL_OBJECTS = 0, DISTANT_OBJECTS = 1, BACKGROUND_OBJECTS = 2, 
-            MIDDLE_OBJECTS = 3, FOREGROUND_OBJECTS = 4;
+            MID_OBJECTS = 3, FOREGROUND_OBJECTS = 4;
     private final ArrayList<SceneObject> layers[];
     
     private String name = "", bg_ambience = "", bg_music = "";
@@ -262,7 +262,7 @@ public class Level {
     public void update() {
         for (int i = layers[ALL_OBJECTS].size() -1; i > -1; i--) {
             SceneObject o = layers[ALL_OBJECTS].get(i);
-            //o.update();
+            o.update();
         }
     }
     
@@ -274,9 +274,6 @@ public class Level {
             bottom = new float[]{bg_color_bottom.getRed(), bg_color_bottom.getGreen(), bg_color_bottom.getBlue()}, 
             interp = new float[]{(bottom[0]-top[0])/steps, (bottom[1]-top[1])/steps, (bottom[2]-top[2])/steps},
             curr = new float[3];
-        ;
-        
-        System.out.println(bg_color_top+"\n"+bg_color_bottom+"\n"+interp[0]+", "+interp[1]+", "+interp[2]);
         
         for (int i = 0; i < steps+1; i++) {
             curr[0] = top[0] + (interp[0]*i);
@@ -286,10 +283,10 @@ public class Level {
             g.fillRect(0, i*(Window.getHeight()/steps), Window.getWidth(), Window.getHeight()/steps);
         }
         
-        for (int i = layers[ALL_OBJECTS].size() -1; i > -1; i--) {
-            SceneObject o = layers[ALL_OBJECTS].get(i);
-            o.draw(g);
+        for (int i = DISTANT_OBJECTS; i <= FOREGROUND_OBJECTS; i++) {
+            for (SceneObject o: layers[i]) o.draw(g);
         }
+        
     }
     
 }

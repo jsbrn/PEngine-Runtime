@@ -1,7 +1,7 @@
-package world.objects.components.logic.handlers;
+package world.objects.components.logic.handlers.general;
 
-import misc.Types;
 import world.objects.components.logic.Block;
+import world.objects.components.logic.handlers.BlockHandler;
 
 public class PrintHandler extends BlockHandler {
     
@@ -9,7 +9,7 @@ public class PrintHandler extends BlockHandler {
     
     @Override
     public void init() {
-        msg = Types.toString((String)getParent().getInput(0)[2]);
+        msg = (String)getParent().resolveInput(0);
     }
     
     @Override
@@ -17,5 +17,8 @@ public class PrintHandler extends BlockHandler {
         System.out.println(msg);
         getParent().getParent().goTo(getParent().getConn(Block.NODE_OUT));
     }
+    
+    @Override
+    public void clean() { msg = ""; }
     
 }

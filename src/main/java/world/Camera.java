@@ -107,9 +107,6 @@ public class Camera {
         if (oob[0] && oob[2]) x = dbounds[0] + ((dbounds[2]-dbounds[0])/2);
         if (oob[1] && oob[3]) x = dbounds[1] + ((dbounds[3]-dbounds[1])/2);
         
-        System.out.println(dbounds[0]+" "+dbounds[1]+" "+dbounds[2]+" "+dbounds[3]);
-        System.out.println(c_bounds[0]+" "+c_bounds[1]+" "+c_bounds[2]+" "+c_bounds[3]);
-        
         
     }
 }

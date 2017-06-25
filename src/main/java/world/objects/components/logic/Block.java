@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.Random;
 import misc.Assets;
 import misc.MiscMath;
+import misc.Types;
+import world.World;
 import world.objects.components.logic.handlers.BlockHandler;
 
 public class Block {
@@ -48,7 +50,29 @@ public class Block {
     }
     
     public void update() { 
-        if (handler == null);
+        if (handler != null) {
+            handler.update();
+        }
+    }
+    
+    public BlockHandler getHandler() { return handler; }
+    
+    public Object resolveInput(int i) {
+        String input = (String)inputs[i][2];
+        int t = (Integer)(inputs[i][1]);
+        int t_ = Types.getType(input);
+        if (t_ == Types.NUMBER) return Types.parseNumber(input);
+        if (t_ == Types.TEXT) return Types.parseText(input);
+        if (t_ == Types.BOOLEAN) return Types.parseBoolean(input);
+        if (t_ == Types.ANIM) return Types.parseAnimation(World.getWorld().getCurrentLevel(), getParent().getParent(), input);
+        if (t_ == Types.FLOW) return Types.parseFlow(World.getWorld().getCurrentLevel(), getParent().getParent(), getParent(), input);
+        if (t_ == Types.LEVEL) return Types.parseLevel(World.getWorld().getCurrentLevel(), input);
+        if (t_ == Types.OBJECT) return Types.parseObject(World.getWorld().getCurrentLevel(), getParent().getParent(), input);
+        if (t_ == Types.ASSET) return Types.parseAsset(input);
+        if (t_ == Types.VARIABLE) return getParent().getVar(input);
+        
+        System.err.println("Cannot resolve input \""+input+"\"");
+        return null;
     }
     
     public Flow getParent() { return parent; }
@@ -200,6 +224,8 @@ public class Block {
                 new Object[]{inputs[i][0], inputs[i][1], inputs[i][2]};
         for (int i = 0; i < b.outputs.length; i++) b.outputs[i] = 
                 new Object[]{outputs[i][0], outputs[i][1], outputs[i][2]};
+        b.handler = Assets.createBlockHandler(b.type);
+        b.handler.setParent(b);
     }
     
     protected void clean() {

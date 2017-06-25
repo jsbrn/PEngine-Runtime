@@ -14,7 +14,7 @@ import world.objects.SceneObject;
 public class Flow {
         
     private ArrayList<Block> blocks;
-    private HashMap vars, starts;
+    private HashMap<String, Object> vars, starts;
     private Block current_block;
     private String name;
     private SceneObject parent;
@@ -51,10 +51,14 @@ public class Flow {
     }
     
     public boolean goTo(int block_id) {
+        if (current_block != null) current_block.getHandler().clean();
         Block next = getBlockByID(block_id);
-        if (next != null) current_block = next;
+        current_block = next;
+        if (next != null) current_block.getHandler().init();
         return next != null;
     }
+    
+    public boolean finished() { return current_block == null; }
     
     public Block getBlock(int index) {
         return blocks.get(index);
@@ -71,9 +75,7 @@ public class Flow {
     public void addBlock(Block b) {
         if (blocks.contains(b) == false) {
             blocks.add(b);
-            //A NOTE: maps start block to "start_value" literally, with quotes
-            //when you flesh out the type parsing, you'll need to change this
-            if (b.getType().equals("s")) starts.put(Types.toString((String)b.getInput(0)[2]), b);
+            if (b.getType().equals("s")) starts.put(Types.parseText((String)b.getInput(0)[2]), b);
             b.setParent(this);
         } else return;
     }

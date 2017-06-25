@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import misc.Assets;
 import misc.MiscMath;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import world.Camera;
+import world.Force;
 import world.Level;
 import world.objects.components.Animation;
 import world.objects.components.logic.Flow;
@@ -24,11 +26,12 @@ public class SceneObject {
     private ArrayList<Animation> animations;
     private ArrayList<Flow> flows, active_flows;
     private Animation current_anim;
+    private HashMap<String, Force> forces;
     
     boolean hitbox = false;
     
     public SceneObject() {
-        this.layer = Level.MIDDLE_OBJECTS;
+        this.layer = Level.MID_OBJECTS;
         this.gravity = false;
         this.type = "";
         this.collides = true;
@@ -38,12 +41,21 @@ public class SceneObject {
         this.world_h = 16;
         this.animations = new ArrayList<Animation>();
         this.flows = new ArrayList<Flow>();
+        this.active_flows = new ArrayList<Flow>();
+        this.forces = new HashMap<String, Force>();
     }
+    
+    public void addForce(String name, Force f) {
+        if (!forces.containsKey(name)) forces.put(name, f);
+    }
+    
+    public void removeForce(String name) { forces.remove(name); }
+    
+    public Force getForce(String name) { return forces.get(name); }
     
     public void launchFlow(Flow f, String start) {
         if (flows.contains(f)) {
-            f.start(start);
-            active_flows.add(f);
+            if (f.start(start)) active_flows.add(f);
         }
     }
     
@@ -63,7 +75,19 @@ public class SceneObject {
     }
     
     public void update() {
-        for (int i = active_flows.size() - 1; i > -1; i--) active_flows.get(i).update();
+        for (int i = active_flows.size() - 1; i > -1; i--) {
+            active_flows.get(i).update();
+            if (active_flows.get(i).finished())
+                active_flows.remove(i);
+        }
+        double[] vel = new double[2];
+        
+        for (Force f: forces.values()) {
+            vel[0] += f.velocity()[0];
+            vel[1] += f.velocity()[1];
+        }
+        world_x += MiscMath.getConstant(vel[0], 1);
+        world_y += MiscMath.getConstant(vel[1], 1); //change this to add collision!
     }
     
     public void move(double x, double y) {
@@ -227,6 +251,7 @@ public class SceneObject {
                     if (a.load(br)) {
                         flows.add(a);
                         a.setParent(this);
+                        this.launchFlow(a, "default");
                     }
                 }
                 

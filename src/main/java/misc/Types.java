@@ -52,20 +52,11 @@ public class Types {
     
     public static boolean isComplex(int type) { return types[type] instanceof ComplexType; }
     
-    public static double toNumber(String number) {
-        return Double.parseDouble(number);
-    }
+    public static double parseNumber(String number) { return Double.parseDouble(number); }
+    public static String parseText(String text) { return text.substring(1, text.length()-1); }
+    public static boolean parseBoolean(String bool) { return Boolean.parseBoolean(bool); }
     
-    public static String toString(String text) {
-        if (types[TEXT].typeOf(text)) return text.substring(1, text.length()-1);
-        return null;
-    }
-    
-    public static boolean toBoolean(String bool) {
-        return Boolean.parseBoolean(bool);
-    }
-    
-    public static Animation toAnimation(Level l, SceneObject o, String anim) {
+    public static Animation parseAnimation(Level l, SceneObject o, String anim) {
         if (!types[ANIM].typeOf(anim)) return null;
         String p[] = ((ComplexType)types[ANIM]).getParams(anim);
         if (p.length == 1 && o != null) return o.getAnimation(p[0]);;
@@ -82,7 +73,7 @@ public class Types {
         return null;
     }
     
-    public static Flow toFlow(Level l, SceneObject o, Flow f, String flow) {
+    public static Flow parseFlow(Level l, SceneObject o, Flow f, String flow) {
         if (!types[FLOW].typeOf(flow)) return null;
         String p[] = ((ComplexType)types[FLOW]).getParams(flow);
         if (p.length == 0) return f;
@@ -99,6 +90,37 @@ public class Types {
         }
         return null;
     }
+    
+    public static Level parseLevel(Level l, String level) {
+        if (!types[LEVEL].typeOf(level)) return null;
+        String name = level.replace("Level(", "").replace(")", "");
+        return name.length() == 0 ? l : World.getWorld().getCurrentLevel();
+    }
+    
+    public static Object parseAsset(String asset) {
+        if (!types[ASSET].typeOf(asset)) return null;
+        return Assets.get(asset.replace("Asset(", "").replace(")", ""));
+    }
+    
+    public static SceneObject parseObject(Level l, SceneObject o, String scene_object) {
+        if (!types[OBJECT].typeOf(scene_object)) return null;
+        String p[] = ((ComplexType)types[OBJECT]).getParams(scene_object);
+        if (p.length == 0) return o;
+        if (p.length == 1 && l != null) return l.getObject(p[0]);
+        if (p.length == 2 && l != null) {
+            Level l2 = World.getWorld().getLevel(p[1]);
+            if (l2 == null) return null;
+            SceneObject o2 = l2.getObject(p[0]);
+            return o2;
+        }
+        return null;
+    }
+    
+    /*public static String toString(double num) { return num+""; }
+    public static String toString(String text) { return "\""+text+"\""; }
+    public static String toString(boolean bool) { return bool+""; }
+    public static String toString(SceneObject o) { return "Object("+o.getName()+", "+o.getParent()+")"; }
+    public static String toString(Animation a) { return "Object("+o.getName()+", "+o.getParent()+")"; }*/
     
 }
 
@@ -190,15 +212,17 @@ class TypeVar extends Type {
 
 class TypeNumber extends Type {
     public TypeNumber() { setName("Number"); }
+    
     @Override
     public boolean typeOf(String value) {
         if (!super.typeOf(value)) return false;
-        return value.replaceAll("[^0-9]", "").equals(value);
+        return value.replaceAll("((\\+|-)?([0-9]+)(\\.[0-9]+)?)|((\\+|-)?\\.?[0-9]+)", "").equals("");
     }
 }
 
 class TypeText extends Type {
     public TypeText() { setName("Text"); }
+
     @Override
     public boolean typeOf(String value) {
         if (!super.typeOf(value)) return false;
@@ -208,6 +232,7 @@ class TypeText extends Type {
 
 class TypeBoolean extends Type {
     public TypeBoolean() { setName("Boolean"); }
+
     @Override
     public boolean typeOf(String value) {
         if (!super.typeOf(value)) return false;
@@ -219,13 +244,6 @@ class TypeBoolean extends Type {
  * COMPLEX TYPE CLASSES
  */
 
-/**
- * if (type == TYPE_ANIM) return i.replaceAll("^(Anim\\()"+params_regex+"(\\))$", "").equals("");
-        if (type == TYPE_FLOW) return i.replaceAll("^(Flow\\()"+params_regex+"(\\))$", "").equals("");
-        if (type == TYPE_OBJECT) return i.replaceAll("^(Object\\()"+params_regex+"(\\))$", "").equals("");
-        if (type == TYPE_LEVEL) return i.replaceAll("^(Level\\()"+params_regex+"(\\))$", "").equals("");
-        if (type == TYPE_ASSET) return i.replaceAll("^(Asset\\()"+params_regex+"(\\))$", "").equals("");
- */
 class TypeAnim extends ComplexType {
     public TypeAnim() { 
         setName("Animation"); 
@@ -243,7 +261,7 @@ class TypeFlow extends ComplexType {
     public TypeFlow() { 
         setName("Flow");
         setAlias("Flow");
-        setParams(3, false);
+        setParams(3, true);
     }
     @Override
     public boolean typeOf(String value) {

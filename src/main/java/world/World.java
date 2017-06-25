@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import misc.Assets;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
+import world.events.EventManager;
 import world.objects.SceneObject;
 
 public class World {
@@ -134,6 +135,7 @@ public class World {
     public void update() {
         if (current_level != null) current_level.update();
         Camera.update();
+        EventManager.clear();
     }
     
     public void draw(Graphics g) {

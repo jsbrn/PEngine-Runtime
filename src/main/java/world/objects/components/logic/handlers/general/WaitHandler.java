@@ -1,17 +1,17 @@
-package world.objects.components.logic.handlers;
+package world.objects.components.logic.handlers.general;
 
-import misc.Types;
 import world.objects.components.logic.Block;
+import world.objects.components.logic.handlers.BlockHandler;
 
 public class WaitHandler extends BlockHandler {
     
-    long start_time = -1;
-    double dur = -1;
+    long start_time;
+    double dur;
     
     @Override
     public void init() {
         start_time = System.currentTimeMillis();
-        dur = Types.toNumber((String)getParent().getInput(0)[2]);
+        dur = (Double)getParent().resolveInput(0);
     }
     
     @Override
@@ -19,5 +19,8 @@ public class WaitHandler extends BlockHandler {
         if (System.currentTimeMillis() - start_time >= dur) 
             getParent().getParent().goTo(getParent().getConn(Block.NODE_OUT));
     }
+    
+    @Override
+    public void clean() { start_time = 0; dur = 0; }
     
 }
