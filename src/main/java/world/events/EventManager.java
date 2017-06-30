@@ -29,3 +29,15 @@ public class EventManager {
     public static void clear() { events.clear(); }
     
 }
+
+class Event {
+    
+    ArrayList<Object> parameters;
+
+    public Event() {
+        this.parameters = new ArrayList<Object>();
+    }
+    
+    public boolean contains(Object o) { return parameters.contains(o); }
+    
+}
