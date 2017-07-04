@@ -6,17 +6,20 @@ import world.objects.components.logic.handlers.BlockHandler;
 
 public class IsKeyPressedHandler extends BlockHandler {
     
-    @Override
-    public void init() {}
+    String c;
     
     @Override
-    public void update() {
-        if (EventManager.exists("collision", this))
-        getFlow().setVar((String)getParent().getOutput(0)[2], a+b);
-        getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+    public void init() {
+        c = (String)getParent().resolveInput(0);
     }
     
     @Override
-    public void clean() { a = 0; b = 0; }
+    public void update() {
+        if (EventManager.exists("keypress", new Object[]{c.charAt(0)})) {
+            getFlow().goTo(getParent().getConn(Block.NODE_YES));
+        } else {
+            getFlow().goTo(getParent().getConn(Block.NODE_NO));
+        }
+    }
     
 }
