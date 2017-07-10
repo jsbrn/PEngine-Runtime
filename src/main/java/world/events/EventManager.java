@@ -10,10 +10,19 @@ public class EventManager {
     public static void add(String name, Event value) {
         ArrayList<Event> list = get(name);
         if (list == null)  { 
-            events.put(name, new ArrayList<Event>());
+            ArrayList<Event> new_ = new ArrayList<Event>();
+            new_.add(value);
+            events.put(name, new_);
         } else {
             list.add(value);
         }
+    }
+    
+    public static void remove(String name, Object[] params) {
+        ArrayList<Event> l = get(name);
+        Event e = get(name, params);
+        if (l == null || e == null) return;
+        l.remove(e);
     }
     
     public static ArrayList<Event> get(String name) {
@@ -21,32 +30,29 @@ public class EventManager {
     }
     
     public static boolean exists(String key, Object[] params) {
+        return get(key, params) != null;
+    }
+    
+    public static Event get(String key, Object[] params) {
         ArrayList<Event> list = get(key);
+        if (list == null) return null;
         for (Event e: list) {
             boolean match = true;
             for (Object o: params) {
                 if (!e.contains(o)) match = false;
             }
-            if (match) return true;
+            if (match) return e;
         }
-        return false;
+        return null;
     }
     
-    public static void clear() { events.clear(); }
-    
-}
-
-class Event {
-    
-    ArrayList<Object> parameters;
-
-    public Event(Object[] params) {
-        this.parameters = new ArrayList<Object>();
-        for (Object o: params) add(o);
+    public static void clear() { 
+        for (ArrayList<Event> list: events.values()) {
+            for (int i = list.size()-1; i > -1; i--) {
+                Event e = list.get(i);
+                if (!e.isPersistent()) list.remove(e);
+            }
+        }
     }
-    
-    public void add(Object o) { parameters.add(o); }
-    
-    public boolean contains(Object o) { return parameters.contains(o); }
     
 }

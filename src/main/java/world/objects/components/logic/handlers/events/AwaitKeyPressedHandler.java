@@ -6,12 +6,16 @@ import world.objects.components.logic.handlers.BlockHandler;
 
 public class AwaitKeyPressedHandler extends BlockHandler {
     
+    String c;
+    
     @Override
-    public void init() {}
+    public void init() {
+        c = (String)getParent().resolveInput(0);
+    }
     
     @Override
     public void update() {
-        if (EventManager.exists("collision", new Object[]{this})) {
+        if (EventManager.exists("keypress", new Object[]{c.charAt(0)})) {
             getFlow().goTo(getParent().getConn(Block.NODE_YES));
         }
     }

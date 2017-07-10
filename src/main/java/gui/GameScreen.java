@@ -9,7 +9,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import world.World;
-import world.events.EventManager;
+import world.events.*;
 
 public class GameScreen extends BasicGameState {
 
@@ -48,12 +48,14 @@ public class GameScreen extends BasicGameState {
     }
 
     public void keyPressed(int key, char c) {
-        EventManager.add("keypress", c);
+        EventManager.add("keypress", new Event(new Object[]{c}, false));
+        EventManager.add("keydown", new Event(new Object[]{c}, true));
     }
     
     @Override
     public void keyReleased(int key, char c) {
-        EventManager.add("keyrelease", c);
+        EventManager.add("keyrelease", new Event(new Object[]{c}, false));
+        EventManager.remove("keydown", new Object[]{c});
     }
 
 }

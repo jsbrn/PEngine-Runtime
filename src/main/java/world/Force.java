@@ -25,7 +25,7 @@ public class Force {
     public double get(int index) { return properties[index]; }
 
     public void update() {
-        properties[MAG] -= MiscMath.getConstant(properties[ACC], 1);
+        properties[MAG] += MiscMath.getConstant(properties[ACC], 1);
         if (properties[MAG] < 0) properties[MAG] = 0;
     }
     

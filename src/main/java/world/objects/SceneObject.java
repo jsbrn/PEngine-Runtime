@@ -13,6 +13,7 @@ import org.newdawn.slick.Image;
 import world.Camera;
 import world.Force;
 import world.Level;
+import world.World;
 import world.objects.components.Animation;
 import world.objects.components.logic.Flow;
 
@@ -31,7 +32,7 @@ public class SceneObject {
     boolean hitbox = false;
     
     public SceneObject() {
-        this.layer = Level.MID_OBJECTS;
+        this.layer = Level.NORMAL_LAYER;
         this.gravity = false;
         this.type = "";
         this.collides = true;
@@ -83,15 +84,98 @@ public class SceneObject {
         double[] vel = new double[2];
         
         for (Force f: forces.values()) {
+            f.update();
             vel[0] += f.velocity()[0];
             vel[1] += f.velocity()[1];
         }
-        world_x += MiscMath.getConstant(vel[0], 1);
-        world_y += MiscMath.getConstant(vel[1], 1); //change this to add collision!
+        
+        //apply collision rules and move
+        move(MiscMath.getConstant(vel[0], 1), MiscMath.getConstant(vel[1], 1));
     }
     
     public void move(double x, double y) {
+        
+        /**
+        * This is the only part of the code which I am not proud of.
+        * It's a giant mess. Collision sucks.
+        */
+        
+        //check for collision
+        SceneObject x_object = null, y_object = null;
+        if (collides) {
+            double[] x_box = new double[]{-Integer.MAX_VALUE, -Integer.MAX_VALUE, 1, 1}, y_box = new double[]{-Integer.MAX_VALUE, -Integer.MAX_VALUE, 1, 1};
+            double y_check_axis = 0, x_check_axis = 0; //the y axis is for the X check, the x axis is for the Y check
+
+            if (x > 0) {
+                x_box = new double[]{getRenderCoords()[0]+getOnscreenWidth(), getRenderCoords()[1]+(1*Camera.getZoom()), (x*Camera.getZoom())+1, getOnscreenHeight()-(2*Camera.getZoom())};
+                x_check_axis = getRenderCoords()[0]+getOnscreenWidth();
+            } else if (x < 0) {
+                x_box = new double[]{getRenderCoords()[0]+(x*Camera.getZoom())-1, getRenderCoords()[1]+(1*Camera.getZoom()), -(x*Camera.getZoom())+1, getOnscreenHeight()-(2*Camera.getZoom())};
+                x_check_axis = getRenderCoords()[0]-(x*Camera.getZoom())-1;
+            }
+
+            if (y > 0) {
+                y_box = new double[]{getRenderCoords()[0]+(1*Camera.getZoom()), getRenderCoords()[1]+getOnscreenHeight(), getOnscreenWidth()-(2*Camera.getZoom()), y*Camera.getZoom()+1};
+                y_check_axis = getRenderCoords()[1]+getOnscreenHeight();
+            } else if (y < 0) {
+                y_box = new double[]{getRenderCoords()[0]+(1*Camera.getZoom()), getRenderCoords()[1]+(y*Camera.getZoom())-1, getOnscreenWidth()-(2*Camera.getZoom()), -(y*Camera.getZoom())+1};
+                y_check_axis = getRenderCoords()[1]-(y*Camera.getZoom())-1;
+            }
+
+            double shortest = Integer.MAX_VALUE;
+            Level current = World.getWorld().getCurrentLevel();
+            for (SceneObject o: current.getObjects(x_box[0], x_box[1], x_box[2], x_box[3])) {
+                if (o.collides && o.equals(this) == false && o.layer == 2) {
+                    double side = o.getRenderCoords()[0];
+                    if (x < 0) {
+                        side = o.getRenderCoords()[0]+o.getOnscreenWidth();
+                    }
+                    double distance = MiscMath.distance(x_check_axis, 0, side, 0);
+                    if (distance < shortest) {
+                        shortest = distance;
+                        x_object = o;
+                    }
+                }
+            }
+            shortest = Integer.MAX_VALUE;
+            ArrayList<SceneObject> colliding = current.getObjects(y_box[0], y_box[1], y_box[2], y_box[3]);
+            for (SceneObject o: colliding) {
+                if (o.equals(this) == false) {
+                    if (o.collides) {
+                        if (o.layer == Level.NORMAL_LAYER || (y > 0 && getRenderCoords()[1]+getOnscreenHeight() < o.getRenderCoords()[1]+(2*Camera.getZoom()) && o.layer == Level.BACKGROUND_LAYER)) {
+                            double side = o.getRenderCoords()[1];
+                            if (y < 0) side = o.getRenderCoords()[1]+o.getOnscreenHeight();
+                            double distance = MiscMath.distance(0, y_check_axis, 0, side);
+                            if (distance < shortest) {
+                                shortest = distance;
+                                y_object = o;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         world_x += x; world_y += y;
+        
+        if (x_object != null) {
+            if (x > 0) {
+                this.setWorldX(x_object.getWorldCoords()[0]-(x_object.getDimensions()[0]/2)-(this.getDimensions()[0]/2));
+            } else {
+                this.setWorldX(x_object.getWorldCoords()[0]+(x_object.getDimensions()[0]/2)+(this.getDimensions()[0]/2));
+            }
+        }
+        if (y_object != null) {
+            if (y > 0) {
+                getForce("gravity").reset();
+                removeForce("jump");
+                this.setWorldY(y_object.getWorldCoords()[1]-(y_object.getDimensions()[1]/2)-(this.getDimensions()[1]/2));
+            } else {
+                getForce("gravity").reset();
+                removeForce("jump");
+                this.setWorldY(y_object.getWorldCoords()[1]+(y_object.getDimensions()[1]/2)+(this.getDimensions()[1]/2));
+            }
+        }
     }
     
     public boolean containsAnimation(String name) {
@@ -137,11 +221,11 @@ public class SceneObject {
         world_h = h < 2 ? 2 : h;
     }
     
-    public void setWorldX(int x) {
+    public void setWorldX(double x) {
         world_x = x;
     }
     
-    public void setWorldY(int y) {
+    public void setWorldY(double y) {
         world_y = y;
     }
     
@@ -227,18 +311,20 @@ public class SceneObject {
                 if (line.indexOf("t=") == 0) type = line.substring(2);
                 if (line.indexOf("tx=") == 0) texture = line.substring(3);
                 if (line.indexOf("h=") == 0) hitbox = Boolean.parseBoolean(line.substring(2));
-                if (line.indexOf("g=") == 0) gravity = Boolean.parseBoolean(line.substring(2));
+                if (line.indexOf("g=") == 0) {
+                    gravity = Boolean.parseBoolean(line.substring(2));
+                    if (gravity) addForce("gravity", new Force(0, 1, 9.81, 0));
+                }
                 if (line.indexOf("c=") == 0) collides = Boolean.parseBoolean(line.substring(2));
                 if (line.indexOf("l=") == 0) layer = Integer.parseInt(line.substring(2));
                 
                 if (line.indexOf("xy=") == 0) {
-                    int[] coords = MiscMath.toIntArray(line.substring(3));
+                    double[] coords = MiscMath.toDoubleArray(line.substring(3));
                     world_x = coords[0]; world_y = coords[1];
                 }
                 if (line.indexOf("wh=") == 0) {
                     int[] dims = MiscMath.toIntArray(line.substring(3));
                     world_w = dims[0]; world_h = dims[1];
-                    world_x += dims[0]/2; world_y += dims[1]/2; //center origin
                 }
                 
                 if (line.equals("a")) {
@@ -335,5 +421,12 @@ public class SceneObject {
     
     public ArrayList<Animation> getAnimations() { return animations; }
     public ArrayList<Flow> getFlows() { return flows; }
+    
+    public int[] getRenderCoords() {
+        int[] osc = getOnscreenCoords();
+        osc[0] -= getDimensions()[0]/2;
+        osc[1] -= getDimensions()[1]/2;
+        return osc;
+    }
     
 }

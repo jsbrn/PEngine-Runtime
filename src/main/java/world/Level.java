@@ -12,14 +12,14 @@ import world.objects.SceneObject;
 
 public class Level {
     
-    public static final int ALL_OBJECTS = 0, DISTANT_OBJECTS = 1, BACKGROUND_OBJECTS = 2, 
-            MID_OBJECTS = 3, FOREGROUND_OBJECTS = 4;
+    public static final int ALL_OBJECTS = 0, DISTANT_LAYER = 1, BACKGROUND_LAYER = 2, 
+            NORMAL_LAYER = 3, FOREGROUND_LAYER = 4;
     private final ArrayList<SceneObject> layers[];
     
     private String name = "", bg_ambience = "", bg_music = "";
     private Color bg_color_top, bg_color_bottom, lighting_color;
     private int zoom = 4; 
-    private int[] bounds;
+    private double[] bounds;
     private double lighting_intensity = 0;
     private boolean loop_bg_music = true, loop_bg_ambience = true, auto_bg_music = true,
             auto_bg_ambience = true, allow_player = true;
@@ -32,7 +32,7 @@ public class Level {
         for (int i = 0; i < layers.length; i++) {
             this.layers[i] = new ArrayList<SceneObject>();
         }
-        this.bounds = new int[]{-128, -64, 256, 128};
+        this.bounds = new double[]{-128, -64, 256, 128};
         this.bg_color_top = new Color(0, 0, 0);
         this.bg_color_bottom = new Color(0, 0, 0);
         this.lighting_color = new Color(0, 0, 0);
@@ -79,7 +79,7 @@ public class Level {
     public float getBGMusicVolume() { return bg_music_vol; }
     
     
-    public int[] bounds() { return bounds; }
+    public double[] bounds() { return bounds; }
     public int getZoom() { return zoom; }
     public void setZoom(int z) { 
         zoom = zoom + z > 8 ? 8 : (zoom + z < 1 ? 1 : zoom);
@@ -102,7 +102,7 @@ public class Level {
     }
     
     public SceneObject getObject(int onscreen_x, int onscreen_y, int skip) {
-        for (int l = FOREGROUND_OBJECTS; l >= DISTANT_OBJECTS; l--) {
+        for (int l = FOREGROUND_LAYER; l >= DISTANT_LAYER; l--) {
             for (int i = layers[l].size()-1; i != -1; i--) {
                 SceneObject o = layers[l].get(i);
                 int[] on_screen = o.getOnscreenCoords();
@@ -115,6 +115,23 @@ public class Level {
         return null;
     }
     
+    public ArrayList<SceneObject> getObjects(double on_screen_x, double on_screen_y, double width, double height) {
+        ArrayList<SceneObject> all_objects = new ArrayList<SceneObject>(), valid = new ArrayList<SceneObject>();
+        all_objects.addAll(layers[DISTANT_LAYER]);
+        all_objects.addAll(layers[BACKGROUND_LAYER]);
+        all_objects.addAll(layers[NORMAL_LAYER]);
+        all_objects.addAll(layers[FOREGROUND_LAYER]);
+        for (int i = all_objects.size()-1; i != -1; i--) {
+            SceneObject o = all_objects.get(i);
+            int[] render_coords = o.getRenderCoords();
+            if (MiscMath.rectanglesIntersect((int)on_screen_x, (int)on_screen_y, (int)width, (int)height, 
+                    render_coords[0], render_coords[1], o.getOnscreenWidth(), o.getOnscreenHeight())) {
+                valid.add(o);
+            }
+        }
+        return valid;
+    }
+    
     public SceneObject getObject(String name) {
         if (name == null) return null;
         for (SceneObject o: layers[ALL_OBJECTS]) if (name.equals(o.getName())) return o;
@@ -122,7 +139,7 @@ public class Level {
     }
     
     public void moveForward(SceneObject o) {
-        for (int i = DISTANT_OBJECTS; i != layers().length; i++) {
+        for (int i = DISTANT_LAYER; i != layers().length; i++) {
             if (i == o.getLayer()) {
                 int orig = layers()[i].indexOf(o);
                 if (orig < layers()[i].size()-1) {
@@ -140,7 +157,7 @@ public class Level {
     }
     
     public void moveBackward(SceneObject o) {
-        for (int i = DISTANT_OBJECTS; i < layers().length; i++) {
+        for (int i = DISTANT_LAYER; i < layers().length; i++) {
             if (i == o.getLayer()) {
                 int orig = layers()[i].indexOf(o);
                 if (orig > 0) {
@@ -153,7 +170,7 @@ public class Level {
     }
     
     public void moveToLayer(int layer, SceneObject o) {
-        for (int i = DISTANT_OBJECTS; i < layers().length; i++) {
+        for (int i = DISTANT_LAYER; i < layers().length; i++) {
             if (i != o.getLayer()) {
                 layers()[i].remove(o);
             } else {
@@ -165,8 +182,8 @@ public class Level {
         o.setLayer(layer);
     }
     
-    public void setBounds(int x, int y, int w, int h) {
-        bounds = new int[]{x, y, w, h};
+    public void setBounds(double x, double y, double w, double h) {
+        bounds = new double[]{x, y, w, h};
     }
     
     public boolean containsObject(String name) {
@@ -221,7 +238,7 @@ public class Level {
                 if (line.equals("/l")) return true;
                 
                 if (line.indexOf("n=") == 0) name = line.substring(2);
-                if (line.indexOf("b=") == 0) bounds = MiscMath.toIntArray(line.substring(2));
+                if (line.indexOf("b=") == 0) bounds = MiscMath.toDoubleArray(line.substring(2));
                 if (line.indexOf("tc=") == 0) {
                     int[] rgb = MiscMath.toIntArray(line.substring(3).split(" "));
                     bg_color_top = new Color(rgb[0], rgb[1], rgb[2]);
@@ -283,7 +300,7 @@ public class Level {
             g.fillRect(0, i*(Window.getHeight()/steps), Window.getWidth(), Window.getHeight()/steps);
         }
         
-        for (int i = DISTANT_OBJECTS; i <= FOREGROUND_OBJECTS; i++) {
+        for (int i = DISTANT_LAYER; i <= FOREGROUND_LAYER; i++) {
             for (SceneObject o: layers[i]) o.draw(g);
         }
         

@@ -11,9 +11,6 @@ import org.newdawn.slick.imageout.ImageOut;
 
 public class Window {
 
-    //the name of the window
-    public static final String WINDOW_TITLE = "Top Secret Project";
-    public static int MIN_WIDTH = 720, MIN_HEIGHT = 515;
     //create a window object
     public static AppGameContainer WINDOW_INSTANCE;
 
@@ -23,7 +20,7 @@ public class Window {
                     .setDisplayMode(Display.getDesktopDisplayMode().getWidth(),
                             Display.getDesktopDisplayMode().getHeight(), true);
         } else {
-            WINDOW_INSTANCE.setDisplayMode(Window.MIN_WIDTH, Window.MIN_HEIGHT, false);
+            WINDOW_INSTANCE.setDisplayMode(750, 500, false);
         }
     }
 
@@ -62,38 +59,16 @@ public class Window {
         }
     }
 
-    /**
-     * Prevent the window from being smaller than an arbitrary dimension.
-     *
-     * @return true if the window had to be resized, false otherwise
-     * @throws SlickException
-     */
-    public static boolean enforceMinimumDimensions() throws SlickException {
-        if (Display.wasResized()) {
-            if (Window.getWidth() < MIN_WIDTH) {
-                WINDOW_INSTANCE.setDisplayMode(720, Window.getHeight(), false);
-                //SlickInitializer.WINDOW_INSTANCE.setResizable(true);
-                return true;
-            }
-            if (Window.getHeight() < MIN_HEIGHT) {
-                WINDOW_INSTANCE.setDisplayMode(Window.getWidth(), 515, false);
-                //SlickInitializer.WINDOW_INSTANCE.setResizable(true);
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static int getFPS() {
         return WINDOW_INSTANCE.getFPS();
     }
 
     public static int getDisplayWidth() {
-        return Display.getDesktopDisplayMode().getWidth();
+        return WINDOW_INSTANCE.getScreenWidth();
     }
 
     public static int getDisplayHeight() {
-        return Display.getDesktopDisplayMode().getHeight();
+        return WINDOW_INSTANCE.getScreenHeight();
     }
 
     public static float getY() {
@@ -113,7 +88,7 @@ public class Window {
     }
 
     public static void setResizable(boolean resizable) {
-        Display.setResizable(resizable);
+        WINDOW_INSTANCE.setResizable(resizable);
     }
 
     public static void setMouseGrabbed(boolean grabbed) {

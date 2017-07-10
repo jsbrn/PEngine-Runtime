@@ -11,6 +11,8 @@ public class Camera {
 
     private static double x = 0, y = 0;
     private static double zoom = 8, speed = 5;
+    
+    private static double[] viewport = new double[4];
 
     /**
      * Sets camera focus speed.
@@ -18,19 +20,34 @@ public class Camera {
     public static void setSpeed(int s) { speed = s >= 0 ? s : 0; }
 
     public static double getX() {
-        return x;
+        double cam_bounds[] = getViewPort();
+        double l_bounds[] = World.getWorld().getCurrentLevel() == null ? new double[4]
+                : World.getWorld().getCurrentLevel().bounds();
+        if (l_bounds[2] <= cam_bounds[2]) return l_bounds[0] + (l_bounds[2]/2);
+        return MiscMath.clamp(x, l_bounds[0] + (cam_bounds[2]/2), 
+                l_bounds[0] + l_bounds[2] - (cam_bounds[2]/2)) - 0.5;
     }
 
-    public static void setX(int x) {
-        Camera.x = x;
+    public static void setX(double x) {
+        //if the stored x is equal to the
+        if (getX() != Camera.x) Camera.x = x;
     }
 
     public static double getY() {
-        return y;
+        double cam_bounds[] = getViewPort();
+        double l_bounds[] = World.getWorld().getCurrentLevel() == null ? new double[4]
+                : World.getWorld().getCurrentLevel().bounds();
+        if (l_bounds[3] <= cam_bounds[3]) return l_bounds[1] + (l_bounds[3]/2);
+        return MiscMath.clamp(y, l_bounds[1] + (cam_bounds[3]/2), 
+                l_bounds[1] + l_bounds[3] - (cam_bounds[3]/2)) - 0.5;
     }
 
-    public static void setY(int y) {
-        Camera.y = y;
+    public static void setY(double y) {
+        if (getY() != Camera.y) Camera.y = y;
+    }
+    
+    public static void move(double x, double y) {
+        setX(Camera.x + x); setY(Camera.y + y);
     }
 
     public static double getZoom() {
@@ -39,8 +56,7 @@ public class Camera {
 
     public static void setZoom(int z) {
         zoom = z;
-        if (zoom > 3) zoom = 3;
-        if (zoom < 1) zoom = 1;
+        if (zoom <= 0) zoom = 1;
     }
 
     public static void addZoom(int z) {
@@ -48,9 +64,7 @@ public class Camera {
     }
 
     public static void reset() {
-        zoom = 1;
-        x = 0;
-        y = 0;
+        zoom = 1; x = 0; y = 0;
     }
 
     public static void setTarget(int wx, int wy) {
@@ -64,49 +78,45 @@ public class Camera {
         target_object = e;
         target_coords = null;
     }
+    
+    public static double[] getViewPort() {
+        return viewport;
+    }
+    
+    public static double[] oob() {
+        //left top right bottom
+        double[] l_bounds = World.getWorld().getCurrentLevel().bounds();
+        double[] cam_bounds = getViewPort();
+        double diffs[] = new double[]{
+            l_bounds[0]-cam_bounds[0],
+            l_bounds[1]-cam_bounds[1],
+            (cam_bounds[2]+cam_bounds[0])-(l_bounds[2]+l_bounds[0]),
+            (cam_bounds[3]+cam_bounds[1])-(l_bounds[3]+l_bounds[1])
+        };
+        return diffs;
+    }
 
     public static void update() {
         
+        //track viewport
+        double[] display_tl_wc = MiscMath.getWorldCoords(0, 0);
+        double[] display_br_wc = MiscMath.getWorldCoords(Window.getWidth(), Window.getHeight());
+        viewport = new double[]{display_tl_wc[0], display_tl_wc[1], 
+            display_br_wc[0]-display_tl_wc[0], display_br_wc[1]-display_tl_wc[1]};
+        
+        //determine target
         int[] target = target_coords;
         target = target_object == null ? target : new int[]{(int)target_object.getWorldCoords()[0], 
             (int)target_object.getWorldCoords()[1]};
         
+        //determine camera velocity and move camera
         if (target != null) {
             double dist = MiscMath.distance(x, y, target[0], target[1]);
-            if (dist > 5) {
+            if (dist > 1) {
                 double vel[] = MiscMath.calculateVelocity((int)(target[0]-x), (int)(target[1]-y));
-                x += MiscMath.getConstant(vel[0]*speed*dist, 1);
-                y += MiscMath.getConstant(vel[1]*speed*dist, 1);
+                move(MiscMath.getConstant(vel[0]*speed*dist, 1), MiscMath.getConstant(vel[1]*speed*dist, 1));
             }
         }
-        
-        //get the rectangle determining the level bounds
-        int[] bounds = World.getWorld().getCurrentLevel().bounds();
-        double[] dbounds = new double[]{bounds[0], bounds[1], bounds[2], bounds[3]};
-        //get the onscreen coords (top left) of the bounds
-        double[] c_bounds = new double[]{
-            (x - (Window.getWidth()/2/zoom)), 
-            (y - (Window.getHeight()/2/zoom)),
-            (Window.getWidth()/zoom),
-            (Window.getHeight()/zoom)
-        };
-        dbounds[2] += dbounds[0]; dbounds[3] += dbounds[1];
-        c_bounds[2] += c_bounds[0]; c_bounds[3] += c_bounds[1];
-        
-        //out of bounds (left top right bottom)
-        boolean oob[] = new boolean[]{
-            dbounds[0] > c_bounds[0],
-            dbounds[1] > c_bounds[1],
-            dbounds[2] < c_bounds[2],
-            dbounds[3] < c_bounds[3]
-        };
-        if (oob[0]) x += dbounds[0] - c_bounds[0];
-        if (oob[1]) y += dbounds[1] - c_bounds[1];
-        if (oob[2]) x -= c_bounds[2] - dbounds[2];
-        if (oob[3]) y -= c_bounds[3] - dbounds[3];
-        if (oob[0] && oob[2]) x = dbounds[0] + ((dbounds[2]-dbounds[0])/2);
-        if (oob[1] && oob[3]) x = dbounds[1] + ((dbounds[3]-dbounds[1])/2);
-        
         
     }
 }

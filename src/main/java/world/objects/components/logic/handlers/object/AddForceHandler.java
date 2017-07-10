@@ -3,7 +3,6 @@ package world.objects.components.logic.handlers.object;
 import misc.MiscMath;
 import world.Force;
 import world.objects.SceneObject;
-import world.objects.components.Animation;
 import world.objects.components.logic.Block;
 import world.objects.components.logic.handlers.BlockHandler;
 

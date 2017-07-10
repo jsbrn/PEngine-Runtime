@@ -6,16 +6,12 @@ import javax.swing.JOptionPane;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import world.objects.components.logic.Block;
-import world.objects.components.logic.handlers.BlockHandler;
-import world.objects.components.logic.handlers.general.PrintHandler;
-import world.objects.components.logic.handlers.general.SetVariableHandler;
-import world.objects.components.logic.handlers.general.StartHandler;
-import world.objects.components.logic.handlers.general.WaitHandler;
-import world.objects.components.logic.handlers.level.SwitchLevelHandler;
-import world.objects.components.logic.handlers.object.AddForceHandler;
-import world.objects.components.logic.handlers.object.RemoveForceHandler;
-import world.objects.components.logic.handlers.object.SetAnimationHandler;
-import world.objects.components.logic.handlers.operations.AddNumbersHandler;
+import world.objects.components.logic.handlers.*;
+import world.objects.components.logic.handlers.events.*;
+import world.objects.components.logic.handlers.general.*;
+import world.objects.components.logic.handlers.level.*;
+import world.objects.components.logic.handlers.object.*;
+import world.objects.components.logic.handlers.operations.*;
 
 public class Assets {
     
@@ -63,7 +59,7 @@ public class Assets {
     public static int assetCount() { return asset_map.size(); }
     
     private static void initBlockList() {   
-        blocks = new Block[9];
+        blocks = new Block[12];
         blocks[0] = new Block("Start", "@id", "s", "ftff", 
                 new Object[][]{{"id", Types.TEXT, ""}}, null);
         blocks[1] = new Block("Wait", "@duration", "w", "ttff", 
@@ -83,6 +79,12 @@ public class Assets {
                     {"angle", Types.NUMBER, ""}, {"acceleration", Types.NUMBER, ""}, {"magnitude", Types.NUMBER, ""}}, null);
         blocks[8] = new Block("Remove force", "Remove force @name from @object", "rf", "ttff", 
                 new Object[][]{{"object", Types.OBJECT, ""}, {"name", Types.TEXT, ""}}, null);
+        blocks[9] = new Block("Is key pressed", "@key", "ikp", "tftt", 
+                new Object[][]{{"key", Types.TEXT, ""}}, null);
+        blocks[10] = new Block("Await key press", "@key", "akp", "ttff", 
+                new Object[][]{{"key", Types.TEXT, ""}}, null);
+        blocks[11] = new Block("Await key release", "@key", "akr", "ttff", 
+                new Object[][]{{"key", Types.TEXT, ""}}, null);
     }
     
     public static BlockHandler createBlockHandler(String block_type) {
@@ -95,6 +97,9 @@ public class Assets {
         if ("sv".equals(block_type)) return new SetVariableHandler();
         if ("af".equals(block_type)) return new AddForceHandler();
         if ("rf".equals(block_type)) return new RemoveForceHandler();
+        if ("ikp".equals(block_type)) return new IsKeyDownHandler();
+        if ("akp".equals(block_type)) return new AwaitKeyPressedHandler();
+        if ("akr".equals(block_type)) return new AwaitKeyReleasedHandler();
         return null;
     }
     

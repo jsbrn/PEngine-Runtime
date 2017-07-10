@@ -4,7 +4,7 @@ import world.events.EventManager;
 import world.objects.components.logic.Block;
 import world.objects.components.logic.handlers.BlockHandler;
 
-public class IsKeyReleasedHandler extends BlockHandler {
+public class IsKeyDownHandler extends BlockHandler {
     
     String c;
     
@@ -15,7 +15,7 @@ public class IsKeyReleasedHandler extends BlockHandler {
     
     @Override
     public void update() {
-        if (EventManager.exists("keyrelease", new Object[]{c.charAt(0)})) {
+        if (EventManager.exists("keydown", new Object[]{c.charAt(0)})) {
             getFlow().goTo(getParent().getConn(Block.NODE_YES));
         } else {
             getFlow().goTo(getParent().getConn(Block.NODE_NO));
