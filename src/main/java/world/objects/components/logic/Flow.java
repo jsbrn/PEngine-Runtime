@@ -47,7 +47,8 @@ public class Flow {
     }
     
     public void update() {
-        if (current_block != null) current_block.update();
+        int count = 0;
+        while (count++ < 10) if (current_block != null) current_block.update();
     }
     
     public boolean goTo(int block_id) {
