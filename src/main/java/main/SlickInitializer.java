@@ -42,7 +42,7 @@ public class SlickInitializer extends StateBasedGame {
             Window.WINDOW_INSTANCE.setDisplayMode(820, 500, false);
             Window.WINDOW_INSTANCE.setFullscreen(false);
             Window.WINDOW_INSTANCE.setShowFPS(false);
-            Window.WINDOW_INSTANCE.setVSync(false);
+            Window.WINDOW_INSTANCE.setVSync(true);
             Window.WINDOW_INSTANCE.setTargetFrameRate(60);
             Window.WINDOW_INSTANCE.setAlwaysRender(true);
             Window.WINDOW_INSTANCE.setResizable(true);

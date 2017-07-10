@@ -43,7 +43,7 @@ public class GameScreen extends BasicGameState {
     //key binding and calling update() in all objects
     @Override
     public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
-        MiscMath.DELTA_TIME = delta;
+        MiscMath.DELTA_TIME = delta > 200 ? 200 : delta; //200ms between frames is 5FPS
         World.getWorld().update();
     }
 
