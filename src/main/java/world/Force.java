@@ -6,10 +6,12 @@ public class Force {
 
     public static final int X_VEL = 0, Y_VEL = 1, ACC = 2, MAG = 3;
     double[] properties, originals;
+    
+    private static final int PIXELS_PER_METER = 19;
 
     public Force(double dx, double dy, double acc, double m) {
-        this.originals = new double[]{dx, dy, acc*acc, m};
-        this.properties = new double[]{dx, dy, acc*acc, m};
+        this.originals = new double[]{dx, dy, acc*PIXELS_PER_METER, m};
+        this.properties = new double[]{dx, dy, acc*PIXELS_PER_METER, m};
     }
 
     /**

@@ -318,7 +318,7 @@ public class SceneObject {
                 if (line.indexOf("h=") == 0) hitbox = Boolean.parseBoolean(line.substring(2));
                 if (line.indexOf("g=") == 0) {
                     gravity = Boolean.parseBoolean(line.substring(2));
-                    if (gravity) addForce("gravity", new Force(0, 1, 9.81, 9.81));
+                    if (gravity) addForce("gravity", new Force(0, 1, 9.81, 0));
                 }
                 if (line.indexOf("c=") == 0) collides = Boolean.parseBoolean(line.substring(2));
                 if (line.indexOf("l=") == 0) layer = Integer.parseInt(line.substring(2));
