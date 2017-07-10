@@ -8,8 +8,8 @@ public class Force {
     double[] properties, originals;
 
     public Force(double dx, double dy, double acc, double m) {
-        this.originals = new double[]{dx, dy, acc, m};
-        this.properties = new double[]{dx, dy, acc, m};
+        this.originals = new double[]{dx, dy, acc*acc, m};
+        this.properties = new double[]{dx, dy, acc*acc, m};
     }
 
     /**

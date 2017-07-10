@@ -149,6 +149,8 @@ public class World {
         double[] l_bounds = World.getWorld().getCurrentLevel().bounds();
         g.drawString("Viewport: "+view[0]+", "+view[1]+", "+(view[2]+view[0])+", "+view[3]+view[1], 10, 70);
         g.drawString("Level bounds: "+l_bounds[0]+", "+l_bounds[1]+", "+(l_bounds[2]+l_bounds[0])+", "+(l_bounds[3]+l_bounds[1]), 10, 90);
+        Force pgrav = player.getForce("gravity");
+        g.drawString("Player gravity: "+pgrav.get(Force.MAG)+", "+pgrav.get(Force.ACC), 10, 110);
     }
     
 }

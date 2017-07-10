@@ -59,7 +59,7 @@ public class Assets {
     public static int assetCount() { return asset_map.size(); }
     
     private static void initBlockList() {   
-        blocks = new Block[12];
+        blocks = new Block[14];
         blocks[0] = new Block("Start", "@id", "s", "ftff", 
                 new Object[][]{{"id", Types.TEXT, ""}}, null);
         blocks[1] = new Block("Wait", "@duration", "w", "ttff", 
@@ -76,7 +76,7 @@ public class Assets {
                 new Object[][]{{"value", Types.ANY, ""}}, new Object[][]{{"var", Types.ANY, ""}});
         blocks[7] = new Block("Add force", "Add force @name to @object: @angle degrees, @magnitude px/s", "af", "ttff", 
                 new Object[][]{{"object", Types.OBJECT, ""}, {"name", Types.TEXT, ""}, 
-                    {"angle", Types.NUMBER, ""}, {"acceleration", Types.NUMBER, ""}, {"magnitude", Types.NUMBER, ""}}, null);
+                    {"angle", Types.NUMBER, "0"}, {"acceleration", Types.NUMBER, "0"}, {"magnitude", Types.NUMBER, "0"}}, null);
         blocks[8] = new Block("Remove force", "Remove force @name from @object", "rf", "ttff", 
                 new Object[][]{{"object", Types.OBJECT, ""}, {"name", Types.TEXT, ""}}, null);
         blocks[9] = new Block("Is key pressed", "@key", "ikp", "tftt", 
@@ -85,6 +85,10 @@ public class Assets {
                 new Object[][]{{"key", Types.TEXT, ""}}, null);
         blocks[11] = new Block("Await key release", "@key", "akr", "ttff", 
                 new Object[][]{{"key", Types.TEXT, ""}}, null);
+        blocks[12] = new Block("Await collision", "Between @object1 & @object2", "ac", "ttff", 
+                new Object[][]{{"object1", Types.OBJECT, ""}, {"object2", Types.OBJECT, ""}}, null);
+        blocks[13] = new Block("If objects intersect", "@object1 & @object2", "ioac", "tftt", 
+                new Object[][]{{"object1", Types.OBJECT, ""}, {"object2", Types.OBJECT, ""}}, null);
     }
     
     public static BlockHandler createBlockHandler(String block_type) {
@@ -100,6 +104,8 @@ public class Assets {
         if ("ikp".equals(block_type)) return new IsKeyDownHandler();
         if ("akp".equals(block_type)) return new AwaitKeyPressedHandler();
         if ("akr".equals(block_type)) return new AwaitKeyReleasedHandler();
+        if ("ac".equals(block_type)) return new AwaitCollisionHandler();
+        if ("ioac".equals(block_type)) return new IfObjectsIntersectHandler();
         return null;
     }
     

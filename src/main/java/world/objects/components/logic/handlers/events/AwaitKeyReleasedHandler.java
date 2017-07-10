@@ -16,7 +16,7 @@ public class AwaitKeyReleasedHandler extends BlockHandler {
     @Override
     public void update() {
         if (EventManager.exists("keyrelease", new Object[]{c.charAt(0)})) {
-            getFlow().goTo(getParent().getConn(Block.NODE_YES));
+            getFlow().goTo(getParent().getConn(Block.NODE_OUT));
         }
     }
     

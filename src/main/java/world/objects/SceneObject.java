@@ -14,6 +14,8 @@ import world.Camera;
 import world.Force;
 import world.Level;
 import world.World;
+import world.events.Event;
+import world.events.EventManager;
 import world.objects.components.Animation;
 import world.objects.components.logic.Flow;
 
@@ -76,21 +78,20 @@ public class SceneObject {
     }
     
     public void update() {
-        for (int i = active_flows.size() - 1; i > -1; i--) {
-            active_flows.get(i).update();
-            if (active_flows.get(i).finished())
-                active_flows.remove(i);
-        }
         double[] vel = new double[2];
-        
         for (Force f: forces.values()) {
             f.update();
             vel[0] += f.velocity()[0];
             vel[1] += f.velocity()[1];
         }
-        
         //apply collision rules and move
         move(MiscMath.getConstant(vel[0], 1), MiscMath.getConstant(vel[1], 1));
+        
+        for (int i = active_flows.size() - 1; i > -1; i--) {
+            active_flows.get(i).update();
+            if (active_flows.get(i).finished())
+                active_flows.remove(i);
+        }
     }
     
     public void move(double x, double y) {
@@ -125,7 +126,7 @@ public class SceneObject {
             double shortest = Integer.MAX_VALUE;
             Level current = World.getWorld().getCurrentLevel();
             for (SceneObject o: current.getObjects(x_box[0], x_box[1], x_box[2], x_box[3])) {
-                if (o.collides && o.equals(this) == false && o.layer == 2) {
+                if (o.collides && o.equals(this) == false && o.layer == Level.NORMAL_LAYER) {
                     double side = o.getRenderCoords()[0];
                     if (x < 0) {
                         side = o.getRenderCoords()[0]+o.getOnscreenWidth();
@@ -142,7 +143,9 @@ public class SceneObject {
             for (SceneObject o: colliding) {
                 if (o.equals(this) == false) {
                     if (o.collides) {
-                        if (o.layer == Level.NORMAL_LAYER || (y > 0 && getRenderCoords()[1]+getOnscreenHeight() < o.getRenderCoords()[1]+(2*Camera.getZoom()) && o.layer == Level.BACKGROUND_LAYER)) {
+                        if (o.layer == Level.NORMAL_LAYER || (y > 0 
+                                && getRenderCoords()[1]+getOnscreenHeight() < o.getRenderCoords()[1]+(2*Camera.getZoom()) 
+                                && o.layer == Level.BACKGROUND_LAYER)) {
                             double side = o.getRenderCoords()[1];
                             if (y < 0) side = o.getRenderCoords()[1]+o.getOnscreenHeight();
                             double distance = MiscMath.distance(0, y_check_axis, 0, side);
@@ -160,22 +163,24 @@ public class SceneObject {
         
         if (x_object != null) {
             if (x > 0) {
-                this.setWorldX(x_object.getWorldCoords()[0]-(x_object.getDimensions()[0]/2)-(this.getDimensions()[0]/2));
+                this.setWorldX(x_object.getWorldCoords()[0]-(x_object.getDimensions()[0]/2)-((double)this.getDimensions()[0]/2));
             } else {
                 this.setWorldX(x_object.getWorldCoords()[0]+(x_object.getDimensions()[0]/2)+(this.getDimensions()[0]/2));
             }
+            EventManager.add("collision", new Event(new Object[]{this, x_object}, false));
         }
         if (y_object != null) {
+            getForce("gravity").reset();
+            removeForce("jump");
             if (y > 0) {
-                getForce("gravity").reset();
-                removeForce("jump");
-                this.setWorldY(y_object.getWorldCoords()[1]-(y_object.getDimensions()[1]/2)-(this.getDimensions()[1]/2));
+                this.setWorldY(y_object.getWorldCoords()[1]-((double)y_object.getDimensions()[1]/2)-((double)this.getDimensions()[1]/2));
             } else {
-                getForce("gravity").reset();
-                removeForce("jump");
                 this.setWorldY(y_object.getWorldCoords()[1]+(y_object.getDimensions()[1]/2)+(this.getDimensions()[1]/2));
             }
+            //if y obj = x obj then at this point an event has already been created
+            if (!y_object.equals(x_object)) EventManager.add("collision", new Event(new Object[]{this, y_object}, false));
         }
+        
     }
     
     public boolean containsAnimation(String name) {
@@ -273,7 +278,7 @@ public class SceneObject {
             Image img = (Image)o;
             return new int[]{img.getWidth(), img.getHeight()};
         }
-        return new int[]{(int)MiscMath.round(world_w, 1), (int)MiscMath.round(world_h, 1)};
+        return new int[]{(int)world_w, (int)world_h};
     }
     
     public void save(BufferedWriter bw) {
@@ -313,7 +318,7 @@ public class SceneObject {
                 if (line.indexOf("h=") == 0) hitbox = Boolean.parseBoolean(line.substring(2));
                 if (line.indexOf("g=") == 0) {
                     gravity = Boolean.parseBoolean(line.substring(2));
-                    if (gravity) addForce("gravity", new Force(0, 1, 9.81, 0));
+                    if (gravity) addForce("gravity", new Force(0, 1, 9.81, 1));
                 }
                 if (line.indexOf("c=") == 0) collides = Boolean.parseBoolean(line.substring(2));
                 if (line.indexOf("l=") == 0) layer = Integer.parseInt(line.substring(2));
@@ -424,8 +429,8 @@ public class SceneObject {
     
     public int[] getRenderCoords() {
         int[] osc = getOnscreenCoords();
-        osc[0] -= getDimensions()[0]/2;
-        osc[1] -= getDimensions()[1]/2;
+        osc[0] -= getOnscreenWidth()/2;
+        osc[1] -= getOnscreenHeight()/2;
         return osc;
     }
     
