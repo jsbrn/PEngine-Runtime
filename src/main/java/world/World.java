@@ -31,6 +31,8 @@ public class World {
     public Level getHomeLevel() {
         return home_level;
     }
+
+    public SceneObject getPlayer() { return player; }
     
     public static World getWorld() { return world; }
     public static void newWorld() { world = new World(); }
