@@ -39,8 +39,8 @@ public class GUIElement {
     }
     
     public final void setParent(GUI parent) { this.parent = parent; }
-    public static final GUI getParent() { return parent; }
-    public static final void setTarget(SceneObject target) { GUIElement.target = target; }
+    public final GUI getParent() { return parent; }
+    public final void setTarget(SceneObject target) { GUIElement.target = target; }
     
     public final int[] osc() {
         if (target == null) return new int[]{0, (int)(offset * 25)};

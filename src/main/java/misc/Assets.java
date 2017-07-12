@@ -9,6 +9,7 @@ import world.objects.components.logic.Block;
 import world.objects.components.logic.handlers.*;
 import world.objects.components.logic.handlers.events.*;
 import world.objects.components.logic.handlers.general.*;
+import world.objects.components.logic.handlers.gui.*;
 import world.objects.components.logic.handlers.level.*;
 import world.objects.components.logic.handlers.object.*;
 import world.objects.components.logic.handlers.operations.*;
@@ -59,7 +60,7 @@ public class Assets {
     public static int assetCount() { return asset_map.size(); }
     
     private static void initBlockList() {   
-        blocks = new Block[14];
+        blocks = new Block[16];
         blocks[0] = new Block("Start", "@id", "s", "ftff", 
                 new Object[][]{{"id", Types.TEXT, ""}}, null);
         blocks[1] = new Block("Wait", "@duration", "w", "ttff", 
@@ -69,16 +70,16 @@ public class Assets {
         blocks[3] = new Block("Switch to level", "@level", "stl", "ttff", 
                 new Object[][]{{"level", Types.LEVEL, ""}}, null);
         blocks[4] = new Block("Set animation", "Set @object animation to @animation", "sa", "ttff", 
-                new Object[][]{{"object", Types.OBJECT, ""}, {"animation", Types.ANIM, ""}}, null);
+                new Object[][]{{"object", Types.OBJECT, "Object()"}, {"animation", Types.ANIM, ""}}, null);
         blocks[5] = new Block("Add", "@number1 + @number2", "adn", "ttff", 
                 new Object[][]{{"number1", Types.NUMBER, ""}, {"number2", Types.NUMBER, ""}}, new Object[][]{{"sum", Types.NUMBER, ""}});
         blocks[6] = new Block("Set variable", "Set @var to @value", "sv", "ttff", 
                 new Object[][]{{"value", Types.ANY, ""}}, new Object[][]{{"var", Types.ANY, ""}});
         blocks[7] = new Block("Add force", "Add force @name to @object: @angle degrees, @magnitude px/s", "af", "ttff", 
-                new Object[][]{{"object", Types.OBJECT, ""}, {"name", Types.TEXT, ""}, 
+                new Object[][]{{"object", Types.OBJECT, "Object()"}, {"name", Types.TEXT, ""}, 
                     {"angle", Types.NUMBER, "0"}, {"acceleration", Types.NUMBER, "0"}, {"magnitude", Types.NUMBER, "0"}}, null);
         blocks[8] = new Block("Remove force", "Remove force @name from @object", "rf", "ttff", 
-                new Object[][]{{"object", Types.OBJECT, ""}, {"name", Types.TEXT, ""}}, null);
+                new Object[][]{{"object", Types.OBJECT, "Object()"}, {"name", Types.TEXT, ""}}, null);
         blocks[9] = new Block("Is key pressed", "@key", "ikp", "tftt", 
                 new Object[][]{{"key", Types.TEXT, ""}}, null);
         blocks[10] = new Block("Await key press", "@key", "akp", "ttff", 
@@ -89,6 +90,12 @@ public class Assets {
                 new Object[][]{{"object1", Types.OBJECT, ""}, {"object2", Types.OBJECT, ""}}, null);
         blocks[13] = new Block("If objects intersect", "@object1 & @object2", "ioac", "tftt", 
                 new Object[][]{{"object1", Types.OBJECT, ""}, {"object2", Types.OBJECT, ""}}, null);
+        blocks[14] = new Block("Say", "@object says: @message", "say", "ttff", 
+                new Object[][]{{"object", Types.OBJECT, "Object()"}, {"message", Types.TEXT, ""},
+                    {"lifespan (mills)", Types.NUMBER, "1000"}, {"require keypress", Types.BOOLEAN, "false"}}, null);
+        blocks[15] = new Block("Await player choice", "@choices", "apc", "ttff", 
+                new Object[][]{{"choices", Types.TEXT_LIST, "List(\"Choice 1\", \"Choice 2\")"}}, 
+                new Object[][]{{"choice", Types.NUMBER, ""}});
     }
     
     public static BlockHandler createBlockHandler(String block_type) {
@@ -106,6 +113,8 @@ public class Assets {
         if ("akr".equals(block_type)) return new AwaitKeyReleasedHandler();
         if ("ac".equals(block_type)) return new AwaitCollisionHandler();
         if ("ioac".equals(block_type)) return new IfObjectsIntersectHandler();
+        if ("say".equals(block_type)) return new SayHandler();
+        if ("apc".equals(block_type)) return new AwaitPlayerChoiceHandler();
         return null;
     }
     

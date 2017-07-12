@@ -62,6 +62,7 @@ public class Block {
         int t = (Integer)(inputs[i][1]);
         int t_ = Types.getType(input);
         if (t_ == Types.NUMBER) return Types.parseNumber(input);
+        if (t_ == Types.TEXT_LIST) return Types.parseTextList(input);
         if (t_ == Types.TEXT) return Types.parseText(input);
         if (t_ == Types.BOOLEAN) return Types.parseBoolean(input);
         if (t_ == Types.ANIM) return Types.parseAnimation(World.getWorld().getCurrentLevel(), getParent().getParent(), input);
@@ -196,9 +197,16 @@ public class Block {
         return inputs[index];
     }
     
+    /**
+     * Get the block output at the index.
+     * @param index
+     * @return An Object[]. {name, type, value}
+     */
     public Object[] getOutput(int index) {
         return outputs[index];
     }
+    
+    public Object resolveOutput(int index) { return outputs[index][2]; }
     
     public int getConn(int index) {
         return conns[index][0];

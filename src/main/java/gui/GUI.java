@@ -17,6 +17,10 @@ public class GUI {
     private int scale;
     private static Image border, w_key, s_key, space_key;
     
+    private static GUI gui;
+    public static GUI getInstance() { return gui; }
+    public static void init() { gui = new GUI(); }
+    
     public GUI() {
         this.elements = new LinkedList<GUIElement>();
         this.scale = 1;
@@ -59,17 +63,16 @@ public class GUI {
     }
     
     public void addElement(GUIElement e) {
-        elements.add(e);
         e.setParent(this);
+        elements.add(e);
     }
     
     public void removeElement(GUIElement e) {
         elements.remove(e);
-        e.setParent(null);
     }
     
     public void draw(Graphics g) {
-        for (int i = elements.size()-1; i > -1; i--) elements.get(i).draw(g);
+        for (int i = 0; i < elements.size(); i++) elements.get(i).draw(g);
     }
     
     public final boolean handleKeyPress(char c) {

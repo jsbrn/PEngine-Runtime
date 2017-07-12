@@ -8,7 +8,7 @@ import org.newdawn.slick.Image;
 
 public class SpeechBubble extends GUIElement {
     
-    private String text = "I know we where pretty goofy on Saturday, had a lot of fun and dicked around quite a bit. But enough with the bullshit. We've' got less than 3 days to cut out the crap and memes and make this presentable. No more fucking around. I forwarded Rob's feedback to you all on Sunday night. Lets make this respectable. Remember this is worth 20% of your final mark for this internship. Ingeborg has the final say on your grade and she will be in the audience. Rob and I are always available via Slack/email. I want to see major changes to everyone's sections by Tuesday night at the absolute latest.";
+    private String text;
     private long delay, creation;
     private boolean wait_for_user;
     
@@ -31,7 +31,7 @@ public class SpeechBubble extends GUIElement {
         String[] p = getParent().wrap(text, 250);
         int f_w = p.length == 1 ? getParent().getFont().getWidth(text) : 250;
         int f_h = getParent().getFont().getHeight(text)*p.length;
-        return new int[]{f_w + 20, f_h + 20 + (wait_for_user ? 42 : 0)};
+        return new int[]{f_w + 20 < 115 && wait_for_user ? 115 : f_w + 20, f_h + 20 + (wait_for_user ? 42 : 0)};
     }
 
     @Override

@@ -9,7 +9,7 @@ public class PrintHandler extends BlockHandler {
     
     @Override
     public void init() {
-        msg = (String)getParent().resolveInput(0);
+        msg = (String)getParent().resolveInput(0).toString();
     }
     
     @Override
