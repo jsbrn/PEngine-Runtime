@@ -9,8 +9,8 @@ import world.objects.SceneObject;
 public class GUIElement {
     
     private static Image border;
-    private static SceneObject target;
-    private static GUI parent;
+    private SceneObject target;
+    private GUI parent;
     
     public static final int FADE_OUT = -1, FADE_IN = 1;
     
@@ -40,7 +40,7 @@ public class GUIElement {
     
     public final void setParent(GUI parent) { this.parent = parent; }
     public final GUI getParent() { return parent; }
-    public final void setTarget(SceneObject target) { GUIElement.target = target; }
+    public final void setTarget(SceneObject target) { this.target = target; }
     
     public final int[] osc() {
         if (target == null) return new int[]{0, (int)(offset * 25)};

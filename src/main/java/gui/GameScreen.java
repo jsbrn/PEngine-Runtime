@@ -1,19 +1,24 @@
 package gui;
 
-import gui.elements.SpeechBubble;
 import misc.Assets;
 import misc.MiscMath;
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
+import world.Camera;
+import world.Force;
+import world.Level;
 import world.World;
 import world.events.*;
+import world.objects.SceneObject;
 
 public class GameScreen extends BasicGameState {
 
+    private boolean debug = false;
     Input input;
     private boolean initialized = false;
 
@@ -33,11 +38,6 @@ public class GameScreen extends BasicGameState {
         World.newWorld();
         World.getWorld().loadProject();
         GUI.init();
-        GUI.getInstance().setScale(4);
-        GUIElement test = new SpeechBubble("I KNOW WE WERE PRETTY GOOFY DICKED AROUND AND HAD A LOT OF FUN", 5000, true);
-        //GUIElement test = new ChoiceBubble(new String[]{"Be pretty goofy", "Have a lot of fun", "Dick around", "Work on report"});
-        test.setTarget(World.getWorld().getPlayer());
-        GUI.getInstance().addElement(test);
         initialized = true;
     }
 
@@ -46,6 +46,21 @@ public class GameScreen extends BasicGameState {
     public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
         World.getWorld().draw(g);
         GUI.getInstance().draw(g);
+        if (debug) {
+            SceneObject player = World.getWorld().getPlayer();
+            Level current_level = World.getWorld().getCurrentLevel();
+            g.setColor(Color.white);
+            g.drawString("Level: "+current_level+" ("+(current_level == null ? "" : current_level.getName())+")", 10, 10);
+            g.drawString("Camera: "+Camera.getX()+", "+Camera.getY(), 10, 30);
+            g.drawString("Player: "+player.getWorldCoords()[0]
+                    +", "+player.getWorldCoords()[1], 10, 50);
+            double[] view = Camera.getViewPort();
+            double[] l_bounds = World.getWorld().getCurrentLevel().bounds();
+            g.drawString("Viewport: "+view[0]+", "+view[1]+", "+(view[2]+view[0])+", "+view[3]+view[1], 10, 70);
+            g.drawString("Level bounds: "+l_bounds[0]+", "+l_bounds[1]+", "+(l_bounds[2]+l_bounds[0])+", "+(l_bounds[3]+l_bounds[1]), 10, 90);
+            Force pgrav = player.getForce("gravity");
+            g.drawString("Player gravity: "+pgrav.get(Force.MAG)+", "+pgrav.get(Force.ACC), 10, 110);
+        }
     }
 
     //key binding and calling update() in all objects
@@ -66,6 +81,7 @@ public class GameScreen extends BasicGameState {
     
     @Override
     public void keyReleased(int key, char c) {
+        if (key == Input.KEY_F3) debug = !debug;
         EventManager.add("keyrelease", new Event(new Object[]{c}, false));
         EventManager.remove("keydown", new Object[]{c});
     }

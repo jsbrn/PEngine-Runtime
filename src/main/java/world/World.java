@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import misc.Assets;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import world.events.EventManager;
 import world.objects.SceneObject;
@@ -142,17 +141,7 @@ public class World {
     public void draw(Graphics g) {
         Camera.update();
         if (current_level != null) current_level.draw(g);
-        g.setColor(Color.white);
-        g.drawString("Level: "+current_level+" ("+(current_level == null ? "" : current_level.getName())+")", 10, 10);
-        g.drawString("Camera: "+Camera.getX()+", "+Camera.getY(), 10, 30);
-        g.drawString("Player: "+player.getWorldCoords()[0]
-                +", "+player.getWorldCoords()[1], 10, 50);
-        double[] view = Camera.getViewPort();
-        double[] l_bounds = World.getWorld().getCurrentLevel().bounds();
-        g.drawString("Viewport: "+view[0]+", "+view[1]+", "+(view[2]+view[0])+", "+view[3]+view[1], 10, 70);
-        g.drawString("Level bounds: "+l_bounds[0]+", "+l_bounds[1]+", "+(l_bounds[2]+l_bounds[0])+", "+(l_bounds[3]+l_bounds[1]), 10, 90);
-        Force pgrav = player.getForce("gravity");
-        g.drawString("Player gravity: "+pgrav.get(Force.MAG)+", "+pgrav.get(Force.ACC), 10, 110);
+        
     }
     
 }
