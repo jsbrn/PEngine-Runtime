@@ -17,8 +17,8 @@ public class SayHandler extends BlockHandler {
     public void init() {
         o = (SceneObject)getParent().resolveInput(0);
         text = (String)getParent().resolveInput(1);
-        delay = (double)getParent().resolveInput(2);
-        wait = (boolean)getParent().resolveInput(3);
+        delay = (Double)getParent().resolveInput(2);
+        wait = (Boolean)getParent().resolveInput(3);
         SpeechBubble b = new SpeechBubble(text, (int)delay, wait);
         b.setTarget(o);
         GUI.getInstance().addElement(b);
