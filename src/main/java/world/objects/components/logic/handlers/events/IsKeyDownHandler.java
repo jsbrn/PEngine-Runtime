@@ -14,12 +14,13 @@ public class IsKeyDownHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         if (EventManager.exists("keydown", new Object[]{c.charAt(0)})) {
             getFlow().goTo(getParent().getConn(Block.NODE_YES));
         } else {
             getFlow().goTo(getParent().getConn(Block.NODE_NO));
         }
+        return true;
     }
     
 }

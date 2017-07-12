@@ -16,9 +16,10 @@ public class AwaitCollisionHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         boolean a_b = EventManager.exists("collision", new Object[]{a, b});
         if (a_b) getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+        return !a_b;
     }
     
 }

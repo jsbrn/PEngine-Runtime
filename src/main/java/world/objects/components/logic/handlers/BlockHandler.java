@@ -7,7 +7,7 @@ public class BlockHandler {
     
     private Block parent;
     
-    public void update() {}
+    public boolean update() { return false; }
     
     public final Block getParent() { return parent; }
     public final void setParent(Block parent) { this.parent = parent; }

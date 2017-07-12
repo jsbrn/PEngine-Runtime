@@ -51,7 +51,7 @@ public class Flow {
         while (count++ < 10) {
             last_block = current_block;
             if (current_block != null) {
-                current_block.update();
+                if (!current_block.update()) break;
             } else { break; }
         }
     }

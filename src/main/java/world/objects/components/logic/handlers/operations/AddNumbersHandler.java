@@ -14,9 +14,10 @@ public class AddNumbersHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         getFlow().setVar((String)getParent().getOutput(0)[2], a+b);
         getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+        return true;
     }
     
     @Override

@@ -16,9 +16,10 @@ public class RemoveForceHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         o.removeForce(name);
         getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+        return true;
     }
     
     @Override

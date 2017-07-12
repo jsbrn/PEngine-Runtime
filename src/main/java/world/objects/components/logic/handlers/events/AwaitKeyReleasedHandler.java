@@ -14,10 +14,10 @@ public class AwaitKeyReleasedHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
-        if (EventManager.exists("keyrelease", new Object[]{c.charAt(0)})) {
-            getFlow().goTo(getParent().getConn(Block.NODE_OUT));
-        }
+    public boolean update() {
+        boolean e = EventManager.exists("keyrelease", new Object[]{c.charAt(0)});
+        if (e) getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+        return !e;
     }
     
 }

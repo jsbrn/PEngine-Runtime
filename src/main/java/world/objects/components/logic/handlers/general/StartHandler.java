@@ -5,8 +5,9 @@ import world.objects.components.logic.handlers.BlockHandler;
 
 public class StartHandler extends BlockHandler {
     
-    public void update() {
+    public boolean update() {
         getParent().getParent().goTo(getParent().getConn(Block.NODE_OUT));
+        return true;
     }
     
 }

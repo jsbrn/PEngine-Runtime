@@ -15,9 +15,12 @@ public class WaitHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
-        if (System.currentTimeMillis() - start_time >= dur) 
+    public boolean update() {
+        if (System.currentTimeMillis() - start_time >= dur) {
             getParent().getParent().goTo(getParent().getConn(Block.NODE_OUT));
+            return true;
+        }
+        return false;
     }
     
     @Override

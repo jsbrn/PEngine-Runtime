@@ -14,10 +14,10 @@ public class AwaitKeyPressedHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
-        if (EventManager.exists("keypress", new Object[]{c.charAt(0)})) {
-            getFlow().goTo(getParent().getConn(Block.NODE_OUT));
-        }
+    public boolean update() {
+        boolean e = EventManager.exists("keypress", new Object[]{c.charAt(0)});
+        if (e) getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+        return !e;
     }
     
 }

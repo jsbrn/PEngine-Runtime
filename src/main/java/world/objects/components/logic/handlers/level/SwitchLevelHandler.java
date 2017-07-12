@@ -15,9 +15,10 @@ public class SwitchLevelHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         World.getWorld().switchToLevel(l);
         getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+        return true;
     }
     
     @Override

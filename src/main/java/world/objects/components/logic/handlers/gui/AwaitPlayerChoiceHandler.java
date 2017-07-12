@@ -24,11 +24,12 @@ public class AwaitPlayerChoiceHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         if (b.isSubmitted()) {
             getFlow().setVar((String)getParent().resolveOutput(0), b.getChoice());
             getParent().getParent().goTo(getParent().getConn(Block.NODE_OUT));
         }
+        return true;
     }
     
     @Override

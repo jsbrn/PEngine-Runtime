@@ -96,6 +96,11 @@ public class SceneObject {
     
     public void move(double x, double y) {
         
+        //maximum velocity is +/- 16 world coordinates on any axis, per frame
+        //to prevent extreme clipping
+        x = MiscMath.clamp(x, -16, 16);
+        y = MiscMath.clamp(y, -16, 16);
+        
         /**
         * This is the only part of the code which I am not proud of.
         * It's a giant mess. Collision sucks.

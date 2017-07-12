@@ -16,12 +16,13 @@ public class IfObjectsIntersectHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         int[] a_rc = a.getRenderCoords(), b_rc = b.getRenderCoords();
         boolean c = MiscMath.rectanglesIntersect(a_rc[0], a_rc[1], a.getOnscreenWidth(), a.getOnscreenHeight(), 
                 b_rc[0], b_rc[1], b.getOnscreenWidth(), b.getOnscreenHeight());
         boolean l = a.getLayer() == b.getLayer();
         getFlow().goTo(getParent().getConn(c && l ? Block.NODE_YES : Block.NODE_NO));
+        return true;
     }
     
 }

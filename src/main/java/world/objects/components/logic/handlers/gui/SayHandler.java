@@ -25,8 +25,9 @@ public class SayHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         getParent().getParent().goTo(getParent().getConn(Block.NODE_OUT));
+        return true;
     }
     
     @Override

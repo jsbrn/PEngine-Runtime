@@ -5,17 +5,18 @@ import world.objects.components.logic.handlers.BlockHandler;
 
 public class PrintHandler extends BlockHandler {
     
-    String msg;
+    Object msg;
     
     @Override
     public void init() {
-        msg = (String)getParent().resolveInput(0).toString();
+        msg = getParent().resolveInput(0);
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         System.out.println(msg);
         getParent().getParent().goTo(getParent().getConn(Block.NODE_OUT));
+        return true;
     }
     
     @Override

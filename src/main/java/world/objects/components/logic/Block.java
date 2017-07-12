@@ -49,10 +49,11 @@ public class Block {
         this.conns = new int[NODE_COUNT][2];
     }
     
-    public void update() { 
+    public boolean update() { 
         if (handler != null) {
-            handler.update();
+            return handler.update();
         }
+        return false;
     }
     
     public BlockHandler getHandler() { return handler; }

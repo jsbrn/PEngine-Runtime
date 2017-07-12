@@ -17,9 +17,10 @@ public class SetAnimationHandler extends BlockHandler {
     }
     
     @Override
-    public void update() {
+    public boolean update() {
         o.setAnimation(anim);
         getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+        return true;
     }
     
     @Override
