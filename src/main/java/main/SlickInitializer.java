@@ -33,14 +33,16 @@ public class SlickInitializer extends StateBasedGame {
         
         Assets.PROJECT_DIR = args.length > 0 ? args[0] : "";
         Assets.STARTING_LEVEL = args.length > 1 ? args[1] : "";
+        boolean fs = false;
+        if (args.length > 2) fs = Boolean.parseBoolean(args[2]);
 
         //the textures and entity lists are loaded in GameScreen.init() now
         try {
             //set window properties
             Window.WINDOW_INSTANCE = new AppGameContainer(new SlickInitializer("PEngine - Test "
                     + "[\""+Assets.PROJECT_DIR+"\", \""+Assets.STARTING_LEVEL+"\"]"));
-            Window.WINDOW_INSTANCE.setDisplayMode(820, 500, false);
-            Window.WINDOW_INSTANCE.setFullscreen(false);
+            if (!fs) Window.WINDOW_INSTANCE.setDisplayMode(820, 500, false);
+            if (fs) Window.toggleFullScreen();
             Window.WINDOW_INSTANCE.setShowFPS(false);
             Window.WINDOW_INSTANCE.setVSync(true);
             Window.WINDOW_INSTANCE.setTargetFrameRate(60);

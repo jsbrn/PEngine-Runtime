@@ -60,10 +60,11 @@ public class Block {
     
     public Object resolveInput(int i) {
         String input = (String)inputs[i][2];
-        int t = (Integer)(inputs[i][1]);
         int t_ = Types.getType(input);
         if (t_ == Types.NUMBER) return Types.parseNumber(input);
-        if (t_ == Types.TEXT_LIST) return Types.parseTextList(input);
+        if (t_ == Types.TEXT_LIST) return Types.parseList(input, Types.TEXT_LIST);
+        if (t_ == Types.NUMBER_LIST) return Types.parseList(input, Types.NUMBER_LIST);
+        if (t_ == Types.BOOLEAN_LIST) return Types.parseList(input, Types.BOOLEAN_LIST);
         if (t_ == Types.TEXT) return Types.parseText(input);
         if (t_ == Types.BOOLEAN) return Types.parseBoolean(input);
         if (t_ == Types.ANIM) return Types.parseAnimation(World.getWorld().getCurrentLevel(), getParent().getParent(), input);
@@ -72,7 +73,6 @@ public class Block {
         if (t_ == Types.OBJECT) return Types.parseObject(World.getWorld().getCurrentLevel(), getParent().getParent(), input);
         if (t_ == Types.ASSET) return Types.parseAsset(input);
         if (t_ == Types.VARIABLE) return getParent().getVar(input);
-        
         System.err.println("Cannot resolve input \""+input+"\"");
         return null;
     }

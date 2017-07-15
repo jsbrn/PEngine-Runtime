@@ -10,30 +10,34 @@ import world.objects.components.logic.Flow;
 public class Types {
     
     public static final int 
-            ANY = 0, 
-            VARIABLE = 1, 
-            NUMBER = 2,
-            TEXT_LIST = 3,
-            TEXT = 4, 
-            BOOLEAN = 5, 
-            ANIM = 6,
-            FLOW = 7, 
-            OBJECT = 8, 
-            LEVEL = 9, 
-            ASSET = 10;
+        ANY = 0, 
+        VARIABLE = 1, 
+        NUMBER = 2,
+        TEXT = 3, 
+        BOOLEAN = 4, 
+        ANIM = 5,
+        FLOW = 6, 
+        OBJECT = 7, 
+        LEVEL = 8, 
+        ASSET = 9,
+        NUMBER_LIST = 10,
+        TEXT_LIST = 11,
+        BOOLEAN_LIST = 12;
     
-    private static Type[] types = {
+    private static final Type[] types = new Type[]{
         new TypeAny(),
         new TypeVar(),
         new TypeNumber(),
-        new TypeTextList(),
         new TypeText(),
         new TypeBoolean(),
         new TypeAnim(),
         new TypeFlow(),
         new TypeObject(),
         new TypeLevel(),
-        new TypeAsset()
+        new TypeAsset(),
+        new TypeList(NUMBER),
+        new TypeList(TEXT),
+        new TypeList(BOOLEAN)
     };
     
     public static Type getType(int index) {
@@ -109,7 +113,7 @@ public class Types {
         if (!types[OBJECT].typeOf(scene_object)) return null;
         String p[] = ((ComplexType)types[OBJECT]).getParams(scene_object);
         if (p.length == 0) return o;
-        if (p.length == 1 && l != null) return l.getObject(p[0]);
+        if (p.length == 1 && l != null) return p[0].equals("player") ? World.getWorld().getPlayer() : l.getObject(p[0]);
         if (p.length == 2 && l != null) {
             Level l2 = World.getWorld().getLevel(p[1]);
             if (l2 == null) return null;
@@ -118,16 +122,26 @@ public class Types {
         }
         return null;
     }
-    public static ArrayList<String> parseTextList(String input) {
-        if (!types[TEXT_LIST].typeOf(input)) return null;
+    
+    /**
+     * Parses a list input into an ArrayList of String objects.
+     * Each block that uses this will need to parse the values accordingly.
+     * @param input The input text.
+     * @param type The list type (only list types allowed).
+     * @return An ArrayList<String>.
+     */
+    public static ArrayList<String> parseList(String input, int type) {
+        if (!types[type].typeOf(input)) return null;
         ArrayList<String> list = new ArrayList<String>();
-        input = input.substring(5, input.length()-1).trim();
-        String[] params = input.split("\"[ ]*,[ ]*\"");
-        for (int i = 0; i < params.length; i++) { 
-            if (i < params.length - 1) params[i] += "\"";
-            if (i > 0) params[i] = "\""+params[i];
-            System.out.println(i+": "+params[i]);
-            if (Types.getType(Types.TEXT).typeOf(params[i])) list.add(params[i].substring(1, params[i].length()-1));
+        Type type_obj = Types.getType(type);
+        int open = 0; String val = "";
+        for (char c: input.toCharArray()) {
+            open += c == '[' ? 1 : (c == ']' ? -1 : 0);
+            if (open == 1 && c != '[' && c != ']') val += c;
+            if (c == ']' && open == 0) {
+                if (Types.getType(((TypeList)type_obj).getSubType()).typeOf(val)) list.add(val);
+                val = "";
+            }
         }
         return list;
     }
@@ -141,15 +155,10 @@ public class Types {
 class Type {
     
     private String name;
-
     protected void setName(String name) {
         this.name = name;
     }
-
-    public String getName() {
-        return name;
-    }
-    
+    public String getName() { return name; }
     /**
      * Returns true if this type is the super type of the value provided.
      * Overridden by the type declarations.
@@ -161,32 +170,26 @@ class Type {
         if (value.length() == 0) return false;
         return value.replaceAll("[{}\t\r\n]", "").equals(value);
     }
-
 }
 
 class ComplexType extends Type {
-    
     private String params_regex, alias;
     //String params_regex = "([^,]+?|([^,]+[,][^,]+?)|([^,]+[,][^,]+[,][^,]+?))";
-    
     public final void setParams(int i, boolean allow_none) {
         i = (int)MiscMath.clamp(i, 1, 3);
         params_regex = "("+"([^,]+?)"
                 +(i >= 2 ? "|([^,]+[,][^,]+?)" : "")
                 +(i == 3 ? "|([^,]+[,][^,]+[,][^,]+?)" : "")+")"+(allow_none ? "?" : "");
     }
-    
     public final String[] getParams(String input) { 
         String p[] = input.substring(alias.length()+1, input.length()-1).split("([ ]*)?[,]([ ]*)?");
         if (p.length == 1) if (p[0].length() == 0) return new String[0];
         return p;
     }
-    
     public final String getAlias() { return alias; }
     public final void setAlias(String w) { alias = w; }
     public final String getParamsRegex() { return params_regex; }
     public boolean isValidName(String name) { return false; }
-    
 }
 
 /**
@@ -236,7 +239,9 @@ class TypeText extends Type {
     @Override
     public boolean typeOf(String value) {
         if (!super.typeOf(value)) return false;
-        return value.charAt(0) == '"' && value.charAt(value.length()-1) == '"';
+        return value.charAt(0) == '"' && value.charAt(value.length()-1) == '"' 
+                && value.length() >= 2
+                && !(value.contains("[") || value.contains("]"));
     }
 }
 
@@ -250,25 +255,43 @@ class TypeBoolean extends Type {
     }
 }
 
-class TypeTextList extends Type {
-    public TypeTextList() { setName("List (Text)"); }
+class TypeList extends Type {
+    
+    private int subtype = -1;
+    
+    public TypeList(int subtype) { 
+        this.subtype = subtype;
+        setName("List (?)");
+    }
+
+    public int getSubType() {
+        return subtype;
+    }
+    
+    @Override
+    public String getName() {
+        return "List ("+Types.getTypeName(subtype)+")";
+    }
+    
     @Override
     public boolean typeOf(String value) {
         if (!super.typeOf(value)) return false;
         value = value.trim();
-        if (value.indexOf("List(") == 0 && value.lastIndexOf(")") == value.length()-1) {
-            value = value.substring(5, value.length()-1).trim();
-            String[] params = value.split("\"[ ]*,[ ]*\"");
-            for (int i = 0; i < params.length; i++) { 
-                if (i < params.length - 1) params[i] += "\"";
-                if (i > 0) params[i] = "\""+params[i];
-                System.out.println(i+": "+params[i]);
-                if (!Types.getType(Types.TEXT).typeOf(params[i])) return false;
+        if (value.replaceAll("((\\[)([\\s\\S]*)(\\]))+", "").length() != 0) return false;
+        int open = 0; String val = "";
+        for (char c: value.toCharArray()) {
+            open += c == '[' ? 1 : (c == ']' ? -1 : 0);
+            if (open == 1 && c != '[' && c != ']') val += c;
+            if (c == ']' && open == 0) {
+                if (!Types.getType(subtype).typeOf(val)) return false;
+                val = "";
             }
-            return true;
+            if (open > 1 || open < 0) return false;
         }
-        return false;
+        if (open != 0) return false;
+        return true;
     }
+    
 }
 
 /**

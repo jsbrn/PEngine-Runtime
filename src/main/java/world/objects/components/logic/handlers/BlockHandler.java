@@ -7,6 +7,11 @@ public class BlockHandler {
     
     private Block parent;
     
+    /**
+     * Update the block handler.
+     * @return true if the parent flow should continue in the same frame, or false if it should
+     * stop until the next.
+     */
     public boolean update() { return false; }
     
     public final Block getParent() { return parent; }
