@@ -3,6 +3,7 @@ package world.objects.components.logic.handlers.gui;
 import gui.GUI;
 import gui.elements.ChoiceBubble;
 import java.util.ArrayList;
+import misc.Types;
 import world.World;
 import world.objects.SceneObject;
 import world.objects.components.logic.Block;
@@ -18,6 +19,8 @@ public class AwaitPlayerChoiceHandler extends BlockHandler {
     public void init() {
         o = World.getWorld().getPlayer();
         choices = (ArrayList<String>)getParent().resolveInput(0);
+        for (int i = 0; i < choices.size(); i++) 
+            choices.set(i, Types.parseText(choices.get(i)));
         b = new ChoiceBubble(choices.toArray(new String[]{}));
         b.setTarget(o);
         GUI.getInstance().addElement(b);
@@ -31,8 +34,5 @@ public class AwaitPlayerChoiceHandler extends BlockHandler {
         }
         return true;
     }
-    
-    @Override
-    public void clean() {  }
     
 }

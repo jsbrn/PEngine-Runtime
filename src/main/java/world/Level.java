@@ -94,6 +94,7 @@ public class Level {
         if (getObjects(ALL_OBJECTS).contains(o) == false) {
             moveToLayer(o.getLayer(), o);
             getObjects(ALL_OBJECTS).add(o);
+            o.setParent(this);
         }
     }
     

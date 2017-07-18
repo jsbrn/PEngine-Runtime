@@ -4,7 +4,7 @@ import world.objects.components.logic.Block;
 import world.objects.components.logic.Flow;
 import world.objects.components.logic.handlers.BlockHandler;
 
-public class SetVariableHandler extends BlockHandler {
+public class GetVariableHandler extends BlockHandler {
 
     Flow f;
     String var;
@@ -14,12 +14,12 @@ public class SetVariableHandler extends BlockHandler {
     public void init() {
         f = (Flow)getParent().resolveInput(0);
         var = (String)getParent().resolveInput(1);
-        val = getParent().resolveInput(2);
+        val = f.getVar(var);
     }
     
     @Override
     public boolean update() {
-        f.setVar(var, val);
+        getFlow().setVar(getParent().resolveOutput(0), val);
         getFlow().goTo(getParent().getConn(Block.NODE_OUT));
         return true;
     }

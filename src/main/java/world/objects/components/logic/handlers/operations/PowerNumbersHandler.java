@@ -3,7 +3,7 @@ package world.objects.components.logic.handlers.operations;
 import world.objects.components.logic.Block;
 import world.objects.components.logic.handlers.BlockHandler;
 
-public class AddNumbersHandler extends BlockHandler {
+public class PowerNumbersHandler extends BlockHandler {
 
     double a, b;
     
@@ -15,7 +15,7 @@ public class AddNumbersHandler extends BlockHandler {
     
     @Override
     public boolean update() {
-        getFlow().setVar(getParent().resolveOutput(0), a+b);
+        getFlow().setVar((String)getParent().resolveOutput(0), Math.pow(a, b));
         getFlow().goTo(getParent().getConn(Block.NODE_OUT));
         return true;
     }

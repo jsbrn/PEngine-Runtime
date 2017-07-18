@@ -20,7 +20,7 @@ import world.objects.components.Animation;
 import world.objects.components.logic.Flow;
 
 public class SceneObject {
-    
+
     private double world_x, world_y, world_w, world_h;
     private String name, type, texture;
     private int layer;
@@ -31,7 +31,10 @@ public class SceneObject {
     private Animation current_anim;
     private HashMap<String, Force> forces;
     
-    boolean hitbox = false;
+    private boolean hitbox = false;
+    
+    private Level parent;
+    private SceneObject anchored_to;
     
     public SceneObject() {
         this.layer = Level.NORMAL_LAYER;
@@ -47,6 +50,23 @@ public class SceneObject {
         this.active_flows = new ArrayList<Flow>();
         this.forces = new HashMap<String, Force>();
     }
+
+    public void anchorTo(SceneObject o) {
+        //remember, world_x and world_y are treated as offsets when anchor is enabled
+        if (o == null && anchored_to != null) {
+            world_x = anchored_to.getWorldCoords()[0] + world_x;
+            world_y = anchored_to.getWorldCoords()[1] + world_y;
+        }
+        if (o != null) {
+            anchorTo(null); //decouple
+            world_x -= anchored_to.getWorldCoords()[0];
+            world_y -= anchored_to.getWorldCoords()[0];
+        }
+    }
+    
+    public Level getParent() { return parent; }
+
+    public void setParent(Level parent) { this.parent = parent; }
     
     public void addForce(String name, Force f) {
         if (!forces.containsKey(name)) forces.put(name, f);
@@ -258,7 +278,9 @@ public class SceneObject {
     public void setCollides(boolean c) { this.collides = c; }
     
     public double[] getWorldCoords() {
-        return new double[]{world_x, world_y};
+        //if anchored, treat the stored coords as an offset
+        return new double[]{anchored_to == null ? world_x : anchored_to.getWorldCoords()[0] + world_x, 
+            anchored_to == null ? world_y : anchored_to.getWorldCoords()[1] + world_y};
     }
     
     public int[] getOnscreenCoords() {

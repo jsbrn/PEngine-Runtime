@@ -3,24 +3,24 @@ package world.objects.components.logic.handlers.operations;
 import world.objects.components.logic.Block;
 import world.objects.components.logic.handlers.BlockHandler;
 
-public class AddNumbersHandler extends BlockHandler {
+public class ConcatHandler extends BlockHandler {
 
-    double a, b;
+    String a, b;
     
     @Override
     public void init() {
-        a = (Double)getParent().resolveInput(0);
-        b = (Double)getParent().resolveInput(1);
+        a = (String)getParent().resolveInput(0);
+        b = (String)getParent().resolveInput(1);
     }
     
     @Override
     public boolean update() {
-        getFlow().setVar(getParent().resolveOutput(0), a+b);
+        getFlow().setVar((String)getParent().getOutput(0)[2], a+b);
         getFlow().goTo(getParent().getConn(Block.NODE_OUT));
         return true;
     }
     
     @Override
-    public void clean() { a = 0; b = 0; }
+    public void clean() { a = ""; b = ""; }
     
 }

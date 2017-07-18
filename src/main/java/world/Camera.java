@@ -29,8 +29,8 @@ public class Camera {
     }
 
     public static void setX(double x) {
-        //if the stored x is equal to the
-        if (getX() != Camera.x) Camera.x = x;
+        Camera.setTarget(null);
+        Camera.x = x;
     }
 
     public static double getY() {
@@ -43,11 +43,12 @@ public class Camera {
     }
 
     public static void setY(double y) {
-        if (getY() != Camera.y) Camera.y = y;
+        Camera.setTarget(null);
+        Camera.y = y;
     }
     
     public static void move(double x, double y) {
-        setX(Camera.x + x); setY(Camera.y + y);
+        Camera.x += x; Camera.y += y;
     }
 
     public static double getZoom() {
@@ -55,8 +56,7 @@ public class Camera {
     }
 
     public static void setZoom(int z) {
-        zoom = z;
-        if (zoom <= 0) zoom = 1;
+        zoom = z < 1 ? 1 : z;
     }
 
     public static void addZoom(int z) {
@@ -64,7 +64,7 @@ public class Camera {
     }
 
     public static void reset() {
-        zoom = 1; x = 0; y = 0;
+        zoom = 1; x = 0; y = 0; target_coords = null; target_object = null;
     }
 
     public static void setTarget(int wx, int wy) {

@@ -60,6 +60,8 @@ public class Block {
     
     public Object resolveInput(int i) {
         String input = (String)inputs[i][2];
+        if (input == null) return null;
+        if ("none".equals(input)) return null;
         int t_ = Types.getType(input);
         if (t_ == Types.NUMBER) return Types.parseNumber(input);
         if (t_ == Types.TEXT_LIST) return Types.parseList(input, Types.TEXT_LIST);
@@ -207,7 +209,7 @@ public class Block {
         return outputs[index];
     }
     
-    public Object resolveOutput(int index) { return outputs[index][2]; }
+    public String resolveOutput(int index) { return (String)outputs[index][2]; }
     
     public int getConn(int index) {
         return conns[index][0];
