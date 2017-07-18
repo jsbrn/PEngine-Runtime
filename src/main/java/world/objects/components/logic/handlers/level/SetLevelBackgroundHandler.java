@@ -11,7 +11,7 @@ import world.objects.components.logic.handlers.BlockHandler;
 public class SetLevelBackgroundHandler extends BlockHandler {
 
     Level l;
-    int[] new_top, new_bottom, old_top, old_bottom, curr_top, curr_bottom;
+    int[] new_top, new_bottom, old_top, old_bottom;
     double transition, lifespan;
     
     @Override
@@ -25,22 +25,24 @@ public class SetLevelBackgroundHandler extends BlockHandler {
             (int)Types.parseNumber(b.get(1)), (int)Types.parseNumber(b.get(2))};
         old_top = new int[]{l.getTopBGColor().getRed(), l.getTopBGColor().getGreen(), l.getTopBGColor().getBlue()};
         old_bottom = new int[]{l.getBottomBGColor().getRed(), l.getBottomBGColor().getGreen(), l.getBottomBGColor().getBlue()};
-        System.arraycopy(old_top, 0, curr_top, 0, old_top.length);
-        System.arraycopy(old_bottom, 0, curr_bottom, 0, old_bottom.length);
         
         transition = (Double)getParent().resolveInput(3);
         lifespan = 0;
+        
     }
     
     @Override
     public boolean update() {
-        transition -= MiscMath.getConstant(1000, 1);
-        lifespan += MiscMath.getConstant(1000, 1);
-        for (int i = 0; i < curr_top.length; i++) curr_top[i] += MiscMath.getConstant(new_top[0]-old_top[0], transition/1000);
-        for (int i = 0; i < curr_bottom.length; i++) curr_bottom[i] += MiscMath.getConstant(new_bottom[0]-old_bottom[0], transition/1000);
-        l.setTopBGColor(new Color(curr_top[0], curr_top[1], curr_top[1]));
-        l.setBottomBGColor(new Color(curr_bottom[0], curr_bottom[1], curr_bottom[2]));
-        if (transition <= 0) {
+        lifespan += MiscMath.getConstant(1000, transition/1000);
+        l.setTopBGColor(new Color(
+                (int)(old_top[0]+((double)(new_top[0]-old_top[0])*(lifespan/transition))), 
+                (int)(old_top[1]+((double)(new_top[1]-old_top[1])*(lifespan/transition))), 
+                (int)(old_top[2]+((double)(new_top[2]-old_top[2])*(lifespan/transition)))));
+        l.setBottomBGColor(new Color(
+                (int)(old_bottom[0]+((double)(new_bottom[0]-old_bottom[0])*(lifespan/transition))), 
+                (int)(old_bottom[1]+((double)(new_bottom[1]-old_bottom[1])*(lifespan/transition))), 
+                (int)(old_bottom[2]+((double)(new_bottom[2]-old_bottom[2])*(lifespan/transition)))));
+        if (lifespan >= transition) {
             l.setTopBGColor(new Color(new_top[0], new_top[1], new_top[1]));
             l.setBottomBGColor(new Color(new_bottom[0], new_bottom[1], new_bottom[2]));
             getFlow().goTo(getParent().getConn(Block.NODE_OUT));

@@ -59,8 +59,9 @@ public class SceneObject {
         }
         if (o != null) {
             anchorTo(null); //decouple
+            anchored_to = o;
             world_x -= anchored_to.getWorldCoords()[0];
-            world_y -= anchored_to.getWorldCoords()[0];
+            world_y -= anchored_to.getWorldCoords()[1];
         }
     }
     
@@ -128,7 +129,7 @@ public class SceneObject {
         
         //check for collision
         SceneObject x_object = null, y_object = null;
-        if (collides) {
+        if (collides && anchored_to == null) {
             double[] x_box = new double[]{-Integer.MAX_VALUE, -Integer.MAX_VALUE, 1, 1}, y_box = new double[]{-Integer.MAX_VALUE, -Integer.MAX_VALUE, 1, 1};
             double y_check_axis = 0, x_check_axis = 0; //the y axis is for the X check, the x axis is for the Y check
 
@@ -151,7 +152,7 @@ public class SceneObject {
             double shortest = Integer.MAX_VALUE;
             Level current = World.getWorld().getCurrentLevel();
             for (SceneObject o: current.getObjects(x_box[0], x_box[1], x_box[2], x_box[3])) {
-                if (o.collides && o.equals(this) == false && o.layer == Level.NORMAL_LAYER) {
+                if ((o.collides && o.anchored_to == null) && o.equals(this) == false && o.layer == Level.NORMAL_LAYER) {
                     double side = o.getRenderCoords()[0];
                     if (x < 0) {
                         side = o.getRenderCoords()[0]+o.getOnscreenWidth();
@@ -167,7 +168,7 @@ public class SceneObject {
             ArrayList<SceneObject> colliding = current.getObjects(y_box[0], y_box[1], y_box[2], y_box[3]);
             for (SceneObject o: colliding) {
                 if (o.equals(this) == false) {
-                    if (o.collides) {
+                    if ((o.collides && o.anchored_to == null)) {
                         if (o.layer == Level.NORMAL_LAYER || (y > 0 
                                 && getRenderCoords()[1]+getOnscreenHeight() < o.getRenderCoords()[1]+(2*Camera.getZoom()) 
                                 && o.layer == Level.BACKGROUND_LAYER)) {
@@ -184,7 +185,7 @@ public class SceneObject {
             }
         }
         
-        world_x += x; world_y += y;
+        if (anchored_to == null) { world_x += x; world_y += y; }
         
         if (x_object != null) {
             if (x > 0) {
@@ -252,11 +253,11 @@ public class SceneObject {
     }
     
     public void setWorldX(double x) {
-        world_x = x;
+        if (anchored_to == null) world_x = x;
     }
     
     public void setWorldY(double y) {
-        world_y = y;
+        if (anchored_to == null) world_y = y;
     }
     
     public String getType() { return type; }

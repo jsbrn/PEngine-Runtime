@@ -15,8 +15,9 @@ public class ANDGateHandler extends BlockHandler {
     
     @Override
     public boolean update() {
-        getFlow().setVar(getParent().resolveOutput(0), a && b);
-        getFlow().goTo(getParent().getConn(Block.NODE_OUT));
+        boolean result = a && b;
+        getFlow().setVar(getParent().resolveOutput(0), result);
+        getFlow().goTo(getParent().getConn(result ? Block.NODE_YES : Block.NODE_NO));
         return true;
     }
     
